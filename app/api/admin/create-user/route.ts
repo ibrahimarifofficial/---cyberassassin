@@ -9,6 +9,9 @@ export const runtime = 'nodejs'
 // Allow GET method for easy browser access
 export async function GET(request: NextRequest) {
   try {
+    // Check database connection first
+    await prisma.$connect()
+    
     // Get credentials from environment variables
     const email = process.env.ADMIN_EMAIL || 'admin@cyber.com'
     const password = process.env.ADMIN_PASSWORD || 'admin'
@@ -49,14 +52,32 @@ export async function GET(request: NextRequest) {
     })
   } catch (error: any) {
     console.error('Error creating admin user:', error)
+    
+    // Provide helpful error message
+    let errorMessage = error.message || 'Failed to create admin user'
+    let suggestions: string[] = []
+    
+    if (errorMessage.includes("Can't reach database server") || errorMessage.includes('P1001')) {
+      suggestions = [
+        '1. Check if your Supabase database is running (it might be paused)',
+        '2. Go to Supabase Dashboard → Project Settings → Database',
+        '3. Verify DATABASE_URL in Vercel environment variables',
+        '4. Make sure the database connection string is correct',
+        '5. If using Supabase free tier, the database might be paused - wake it up first'
+      ]
+    }
+    
     return NextResponse.json(
       {
         success: false,
-        error: error.message || 'Failed to create admin user',
-        details: error.stack,
+        error: errorMessage,
+        ...(suggestions.length > 0 && { suggestions }),
+        ...(process.env.NODE_ENV === 'development' && { details: error.stack }),
       },
       { status: 500 }
     )
+  } finally {
+    await prisma.$disconnect().catch(() => {})
   }
 }
 
