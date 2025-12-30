@@ -1,2 +1,6 @@
-# Auto detect text files and perform LF normalization
-* text=auto
+# Git LFS for large build files
+.next/** filter=lfs diff=lfs merge=lfs -text
+.next/cache/** filter=lfs diff=lfs merge=lfs -text
+.next/static/** filter=lfs diff=lfs merge=lfs -text
+.next/server/** filter=lfs diff=lfs merge=lfs -text
+
