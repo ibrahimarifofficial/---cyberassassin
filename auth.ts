@@ -12,7 +12,10 @@ const isBuildPhase = () => {
 }
 
 // Lazy load Prisma to avoid build-time database connection
-const getPrisma = () => {
+let prismaInstance: any = null
+let prismaPromise: Promise<any> | null = null
+
+const getPrisma = async () => {
   if (isBuildPhase()) {
     // Return a dummy prisma client during build
     return {
@@ -21,13 +24,21 @@ const getPrisma = () => {
       },
     } as any
   }
-  return require('@/lib/prisma').prisma
+  
+  if (!prismaInstance) {
+    if (!prismaPromise) {
+      prismaPromise = import('@/lib/prisma').then(module => module.prisma)
+    }
+    prismaInstance = await prismaPromise
+  }
+  return prismaInstance
 }
 
 // Lazy initialization of NextAuth to prevent build-time execution
 let nextAuthInstance: any = null
+let nextAuthPromise: Promise<any> | null = null
 
-const getNextAuth = () => {
+const getNextAuth = async () => {
   // During build phase, return a dummy instance that won't be used
   if (isBuildPhase()) {
     return {
@@ -42,88 +53,99 @@ const getNextAuth = () => {
   }
   
   if (!nextAuthInstance) {
-    // Only import and initialize at runtime
-    const NextAuth = require('next-auth').default
-    const Credentials = require('next-auth/providers/credentials').default
-    const bcrypt = require('bcryptjs')
+    if (!nextAuthPromise) {
+      // Use dynamic import for ESM packages
+      nextAuthPromise = (async () => {
+        const [NextAuthModule, CredentialsModule, bcryptModule] = await Promise.all([
+          import('next-auth'),
+          import('next-auth/providers/credentials'),
+          import('bcryptjs')
+        ])
+        
+        const NextAuth = NextAuthModule.default
+        const Credentials = CredentialsModule.default
+        const bcrypt = bcryptModule.default
 
-    // Support both AUTH_SECRET (NextAuth v5) and NEXTAUTH_SECRET (fallback)
-    const secret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET
+        // Support both AUTH_SECRET (NextAuth v5) and NEXTAUTH_SECRET (fallback)
+        const secret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET
 
-    const authConfig: NextAuthConfig = {
-      secret: secret,
-      providers: [
-        Credentials({
-          name: 'Credentials',
-          credentials: {
-            email: { label: 'Email', type: 'email' },
-            password: { label: 'Password', type: 'password' },
+        const authConfig: NextAuthConfig = {
+          secret: secret,
+          providers: [
+            Credentials({
+              name: 'Credentials',
+              credentials: {
+                email: { label: 'Email', type: 'email' },
+                password: { label: 'Password', type: 'password' },
+              },
+              async authorize(credentials) {
+                if (!credentials?.email || !credentials?.password) {
+                  return null
+                }
+
+                const db = await getPrisma()
+                const user = await db.user.findUnique({
+                  where: { email: credentials.email as string },
+                })
+
+                if (!user || !user.password) {
+                  return null
+                }
+
+                const isPasswordValid = await bcrypt.compare(
+                  credentials.password as string,
+                  user.password
+                )
+
+                if (!isPasswordValid) {
+                  return null
+                }
+
+                return {
+                  id: user.id,
+                  email: user.email,
+                  name: user.name,
+                  role: user.role,
+                }
+              },
+            }),
+          ],
+          session: {
+            strategy: 'jwt',
           },
-          async authorize(credentials) {
-            if (!credentials?.email || !credentials?.password) {
-              return null
-            }
-
-            const db = getPrisma()
-            const user = await db.user.findUnique({
-              where: { email: credentials.email as string },
-            })
-
-            if (!user || !user.password) {
-              return null
-            }
-
-            const isPasswordValid = await bcrypt.compare(
-              credentials.password as string,
-              user.password
-            )
-
-            if (!isPasswordValid) {
-              return null
-            }
-
-            return {
-              id: user.id,
-              email: user.email,
-              name: user.name,
-              role: user.role,
-            }
+          pages: {
+            signIn: '/admin/login',
           },
-        }),
-      ],
-      session: {
-        strategy: 'jwt',
-      },
-      pages: {
-        signIn: '/admin/login',
-      },
-      callbacks: {
-        async jwt({ token, user }) {
-          if (user) {
-            token.id = user.id
-            token.role = (user as any).role
-          }
-          return token
-        },
-        async session({ session, token }) {
-          if (session.user) {
-            session.user.id = token.id as string
-            session.user.role = token.role as string
-          }
-          return session
-        },
-      },
+          callbacks: {
+            async jwt({ token, user }) {
+              if (user) {
+                token.id = user.id
+                token.role = (user as any).role
+              }
+              return token
+            },
+            async session({ session, token }) {
+              if (session.user) {
+                session.user.id = token.id as string
+                session.user.role = token.role as string
+              }
+              return session
+            },
+          },
+        }
+
+        return NextAuth(authConfig)
+      })()
     }
-
-    nextAuthInstance = NextAuth(authConfig)
+    nextAuthInstance = await nextAuthPromise
   }
   return nextAuthInstance
 }
 
 // Export handlers - completely lazy, only created when accessed
 // This function is only called when handlers are actually needed (at runtime)
-function createHandlers() {
-  const nextAuth = getNextAuth()
+async function createHandlers() {
+  const nextAuth = await getNextAuth()
   return {
     GET: async (request: Request) => {
       return nextAuth.handlers.GET(request)
@@ -136,21 +158,29 @@ function createHandlers() {
 
 // Export handlers as a getter function to prevent build-time evaluation
 // This ensures Next.js doesn't try to analyze the handlers during build
-let _handlers: ReturnType<typeof createHandlers> | null = null
+let _handlers: Awaited<ReturnType<typeof createHandlers>> | null = null
+let _handlersPromise: Promise<Awaited<ReturnType<typeof createHandlers>>> | null = null
 
-const getHandlers = () => {
+const getHandlers = async () => {
   if (!_handlers) {
-    _handlers = createHandlers()
+    if (!_handlersPromise) {
+      _handlersPromise = createHandlers()
+    }
+    _handlers = await _handlersPromise
   }
   return _handlers
 }
 
 // Export handlers object - using Object.defineProperty to make it truly lazy
-export const handlers = {} as ReturnType<typeof createHandlers>
+export const handlers = {} as Awaited<ReturnType<typeof createHandlers>>
 
 Object.defineProperty(handlers, 'GET', {
   get() {
-    return getHandlers().GET
+    // Return a function that awaits the handlers
+    return async (request: Request) => {
+      const h = await getHandlers()
+      return h.GET(request)
+    }
   },
   enumerable: true,
   configurable: true
@@ -158,14 +188,19 @@ Object.defineProperty(handlers, 'GET', {
 
 Object.defineProperty(handlers, 'POST', {
   get() {
-    return getHandlers().POST
+    // Return a function that awaits the handlers
+    return async (request: Request) => {
+      const h = await getHandlers()
+      return h.POST(request)
+    }
   },
   enumerable: true,
   configurable: true
 })
 
 export const signIn = async (provider?: string, options?: any) => {
-  const { signIn: authSignIn } = getNextAuth()
+  const nextAuth = await getNextAuth()
+  const { signIn: authSignIn } = nextAuth
   if (provider) {
     return authSignIn(provider, options)
   }
@@ -173,12 +208,14 @@ export const signIn = async (provider?: string, options?: any) => {
 }
 
 export const signOut = async (options?: any) => {
-  const { signOut: authSignOut } = getNextAuth()
+  const nextAuth = await getNextAuth()
+  const { signOut: authSignOut } = nextAuth
   return authSignOut(options)
 }
 
 export const auth = async () => {
-  const { auth: authFn } = getNextAuth()
+  const nextAuth = await getNextAuth()
+  const { auth: authFn } = nextAuth
   return authFn()
 }
 
