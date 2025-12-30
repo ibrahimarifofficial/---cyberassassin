@@ -120,23 +120,49 @@ const getNextAuth = () => {
   return nextAuthInstance
 }
 
-// Export getters that initialize NextAuth only when accessed
-// Using a function to ensure lazy evaluation
+// Export handlers - completely lazy, only created when accessed
+// This function is only called when handlers are actually needed (at runtime)
 function createHandlers() {
+  const nextAuth = getNextAuth()
   return {
     GET: async (request: Request) => {
-      const { handlers: authHandlers } = getNextAuth()
-      return authHandlers.GET(request)
+      return nextAuth.handlers.GET(request)
     },
     POST: async (request: Request) => {
-      const { handlers: authHandlers } = getNextAuth()
-      return authHandlers.POST(request)
+      return nextAuth.handlers.POST(request)
     },
   }
 }
 
-// Export handlers - will only be created when accessed
-export const handlers = createHandlers()
+// Export handlers as a getter function to prevent build-time evaluation
+// This ensures Next.js doesn't try to analyze the handlers during build
+let _handlers: ReturnType<typeof createHandlers> | null = null
+
+const getHandlers = () => {
+  if (!_handlers) {
+    _handlers = createHandlers()
+  }
+  return _handlers
+}
+
+// Export handlers object - using Object.defineProperty to make it truly lazy
+export const handlers = {} as ReturnType<typeof createHandlers>
+
+Object.defineProperty(handlers, 'GET', {
+  get() {
+    return getHandlers().GET
+  },
+  enumerable: true,
+  configurable: true
+})
+
+Object.defineProperty(handlers, 'POST', {
+  get() {
+    return getHandlers().POST
+  },
+  enumerable: true,
+  configurable: true
+})
 
 export const signIn = async (provider?: string, options?: any) => {
   const { signIn: authSignIn } = getNextAuth()
