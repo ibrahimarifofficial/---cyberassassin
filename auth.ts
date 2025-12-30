@@ -6,6 +6,7 @@ const isBuildPhase = () => {
   return (
     process.env.NEXT_PHASE === 'phase-production-build' ||
     process.env.NEXT_PHASE === 'phase-development-build' ||
+    process.env.NEXT_PHASE?.includes('build') === true ||
     (!process.env.DATABASE_URL && process.env.NODE_ENV === 'production')
   )
 }
@@ -46,7 +47,11 @@ const getNextAuth = () => {
     const Credentials = require('next-auth/providers/credentials').default
     const bcrypt = require('bcryptjs')
 
+    // Support both AUTH_SECRET (NextAuth v5) and NEXTAUTH_SECRET (fallback)
+    const secret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET
+
     const authConfig: NextAuthConfig = {
+      secret: secret,
       providers: [
         Credentials({
           name: 'Credentials',

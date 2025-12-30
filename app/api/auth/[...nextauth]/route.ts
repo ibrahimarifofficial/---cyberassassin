@@ -5,21 +5,47 @@ export const runtime = 'nodejs'
 export const fetchCache = 'force-no-store'
 export const revalidate = 0
 
+// Check if we're in build phase
+const isBuildPhase = () => {
+  if (typeof process === 'undefined') return false
+  return (
+    process.env.NEXT_PHASE === 'phase-production-build' ||
+    process.env.NEXT_PHASE === 'phase-development-build' ||
+    process.env.NEXT_PHASE?.includes('build') === true
+  )
+}
+
 // Lazy load handlers to prevent build-time initialization
 async function getHandlers() {
+  // During build, return dummy handlers immediately
+  if (isBuildPhase()) {
+    return {
+      GET: async () => new Response(JSON.stringify({ error: 'Not available during build' }), { 
+        status: 503,
+        headers: { 'Content-Type': 'application/json' }
+      }),
+      POST: async () => new Response(JSON.stringify({ error: 'Not available during build' }), { 
+        status: 503,
+        headers: { 'Content-Type': 'application/json' }
+      }),
+    }
+  }
+
   try {
     const { handlers } = await import('@/auth')
     return handlers
   } catch (error: any) {
-    // If we're in build phase, return a dummy handler
-    if (typeof process !== 'undefined' && 
-        (process.env.NEXT_PHASE?.includes('build') || !process.env.DATABASE_URL)) {
-      return {
-        GET: async () => new Response('Not available during build', { status: 503 }),
-        POST: async () => new Response('Not available during build', { status: 503 }),
-      }
+    console.error('Error loading auth handlers:', error)
+    return {
+      GET: async () => new Response(JSON.stringify({ error: 'Authentication service unavailable' }), { 
+        status: 503,
+        headers: { 'Content-Type': 'application/json' }
+      }),
+      POST: async () => new Response(JSON.stringify({ error: 'Authentication service unavailable' }), { 
+        status: 503,
+        headers: { 'Content-Type': 'application/json' }
+      }),
     }
-    throw error
   }
 }
 
