@@ -1,12 +1,17 @@
 import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
-import { PrismaAdapter } from '@auth/prisma-adapter'
-import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 import type { NextAuthConfig } from 'next-auth'
 
-export const authConfig = {
-  adapter: PrismaAdapter(prisma) as any,
+// Lazy load Prisma to avoid build-time database connection
+const getPrisma = () => {
+  return require('@/lib/prisma').prisma
+}
+
+// Note: Adapter is not needed since we're using JWT strategy
+// The adapter is only required for database sessions
+
+export const authConfig: NextAuthConfig = {
   providers: [
     Credentials({
       name: 'Credentials',
@@ -19,7 +24,8 @@ export const authConfig = {
           return null
         }
 
-        const user = await prisma.user.findUnique({
+        const db = getPrisma()
+        const user = await db.user.findUnique({
           where: { email: credentials.email as string },
         })
 
