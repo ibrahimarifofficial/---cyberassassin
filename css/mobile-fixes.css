@@ -1,0 +1,520 @@
+/* ============================================
+   Mobile Responsiveness Fixes
+   ============================================ */
+
+/* ============================================
+   1. Navigation Background Blur on Mobile
+   ============================================ */
+
+@media (max-width: 1024px) {
+  .header__nav {
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+  }
+  
+  .header__container {
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+  }
+}
+
+/* ============================================
+   2. Trusted Badge Animation Fix - Desktop & Mobile
+   ============================================ */
+
+/* Ensure badge animation works on all devices */
+.about__badge {
+  animation: float 4s ease-in-out infinite !important;
+  will-change: transform !important;
+}
+
+/* Ensure badge is visible on mobile - restore original positioning */
+@media (max-width: 768px) {
+  .about__badge {
+    position: absolute !important;
+    bottom: 20px !important;
+    left: 20px !important;
+    display: flex !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    animation: float 4s ease-in-out infinite !important;
+    will-change: transform !important;
+  }
+  
+  .about__image-wrapper {
+    position: relative !important;
+  }
+  
+  .about__image-container {
+    position: relative !important;
+  }
+}
+
+/* ============================================
+   3. About Section List Gaps Remove
+   ============================================ */
+
+@media (max-width: 768px) {
+  .about__features {
+    grid-template-columns: 1fr !important;
+    gap: var(--spacing-sm) !important;
+  }
+  
+  .about__features-col {
+    gap: var(--spacing-sm) !important;
+  }
+}
+
+/* ============================================
+   4. Services Slider Fix
+   ============================================ */
+
+@media (max-width: 768px) {
+  .service-card-hover {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    flex-shrink: 0 !important;
+  }
+  
+  .service-cards-layout {
+    grid-template-columns: 1fr !important;
+    gap: var(--spacing-md) !important;
+  }
+  
+  /* Smooth slider container */
+  .service-cards-layout > div:first-child {
+    overflow: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    position: relative !important;
+  }
+  
+  /* Smooth transitions */
+  .service-cards-layout > div:first-child > div {
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    -webkit-transition: -webkit-transform 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    will-change: transform !important;
+  }
+}
+
+/* ============================================
+   5. Work With Us Dark Overlay on Mobile
+   ============================================ */
+
+@media (max-width: 768px) {
+  .work-with-us::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6) !important;
+    z-index: 1;
+    pointer-events: none;
+  }
+  
+  .work-with-us > * {
+    position: relative;
+    z-index: 2;
+  }
+}
+
+/* ============================================
+   6. Testimonials Arrows and Card Width Fix
+   ============================================ */
+
+@media (max-width: 768px) {
+  .testimonials__slider {
+    padding: 0 var(--spacing-md) !important;
+  }
+  
+  .testimonial-card {
+    width: calc(100% - 40px) !important;
+    min-width: calc(100% - 40px) !important;
+    margin: 0 var(--spacing-sm) !important;
+  }
+  
+  .testimonials__nav {
+    display: none !important;
+  }
+}
+
+/* ============================================
+   7. Final CTA Robot Position on Mobile - Bring from Footer
+   ============================================ */
+
+@media (max-width: 768px) {
+  .final-cta__wrapper {
+    grid-template-columns: 1fr !important;
+    gap: var(--spacing-xl) !important;
+    position: relative !important;
+  }
+  
+  .final-cta__image {
+    order: 2 !important;
+    margin-top: var(--spacing-xl) !important;
+    margin-bottom: -200px !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+  
+  .final-cta__content {
+    order: 1 !important;
+  }
+  
+  .final-cta__image img {
+    max-width: 300px !important;
+  }
+}
+
+/* ============================================
+   8. Footer Logo Fix
+   ============================================ */
+
+@media (max-width: 768px) {
+  .footer__logo-img {
+    max-width: 180px !important;
+    height: auto !important;
+    object-fit: contain !important;
+  }
+}
+
+/* ============================================
+   9. About Page Hero Mobile Fixes
+   ============================================ */
+
+@media (max-width: 768px) {
+  .about-hero > div > div:last-child > div:first-child {
+    display: none !important; /* Hide "CyberAssassin" text */
+  }
+  
+  .about-hero > div > div:last-child > div:last-child {
+    text-align: center !important;
+  }
+  
+  .hero-breadcrumb {
+    justify-content: center !important;
+  }
+}
+
+/* ============================================
+   10. Our Expertise Section Gap Fix
+   ============================================ */
+
+@media (max-width: 768px) {
+  .expertise-section > div > div:first-child {
+    margin-bottom: var(--spacing-md) !important;
+  }
+  
+  .expertise-section h2 {
+    margin-bottom: var(--spacing-md) !important;
+  }
+  
+  /* Remove gap above "Harnessing the Power" */
+  .expertise-section > div > div > div:first-child > div:first-child {
+    margin-bottom: var(--spacing-sm) !important;
+  }
+}
+
+/* ============================================
+   11. Mobile Menu - Remove Mega Menu, Use Normal Menu
+   ============================================ */
+
+@media (max-width: 1024px) {
+  .header__mega-menu {
+    display: none !important;
+  }
+  
+  .header__dropdown-menu {
+    display: block !important;
+    position: static !important;
+    transform: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
+    transition: all 0.3s ease !important;
+    margin-top: 4px !important;
+    background: rgba(26, 26, 26, 0.5) !important;
+    border-radius: 8px !important;
+    padding: 0 !important;
+  }
+  
+  /* Disable hover on mobile - only click works */
+  .header__dropdown:hover .header__dropdown-menu {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    max-height: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* Only show when active class is present (click) */
+  .header__dropdown-menu.active {
+    opacity: 1 !important;
+    visibility: visible !important;
+    max-height: 500px !important;
+    padding: var(--spacing-sm) !important;
+  }
+  
+  .header__dropdown-toggle[aria-expanded="true"] + .header__dropdown-menu {
+    opacity: 1 !important;
+    visibility: visible !important;
+    max-height: 500px !important;
+    padding: var(--spacing-sm) !important;
+  }
+  
+  .header__dropdown-link {
+    display: block !important;
+    padding: 10px 16px !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+    text-decoration: none !important;
+    border-radius: 6px !important;
+    transition: all 0.2s ease !important;
+    font-size: 14px !important;
+  }
+  
+  .header__dropdown-link:hover {
+    background: rgba(249, 0, 77, 0.1) !important;
+    color: #ffffff !important;
+  }
+}
+
+/* ============================================
+   12. Blog Page Hero Mobile Fixes
+   ============================================ */
+
+@media (max-width: 768px) {
+  .blog-hero > div > div:last-child > div:first-child {
+    display: none !important; /* Hide "CyberAssassin" text */
+  }
+  
+  .blog-hero > div > div:last-child > div:last-child {
+    text-align: center !important;
+  }
+  
+  .hero-breadcrumb {
+    justify-content: center !important;
+  }
+  
+  /* Remove 2 featured posts on mobile */
+  .featured-posts-right {
+    display: none !important;
+  }
+  
+  .featured-posts-layout {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ============================================
+   13. Services Page Hero Mobile Fixes
+   ============================================ */
+
+@media (max-width: 768px) {
+  .services-hero > div > div:last-child > div:first-child {
+    display: none !important; /* Hide "CyberAssassin" text */
+  }
+  
+  .services-hero > div > div:last-child > div:last-child {
+    text-align: center !important;
+  }
+  
+  .hero-breadcrumb {
+    justify-content: center !important;
+  }
+  
+  /* Remove icons from "There's More We Offer" section on mobile */
+  .more-we-offer-section > div:first-child > div:last-child > div:first-child {
+    display: none !important;
+  }
+  
+  /* Also hide the icons grid if it exists */
+  .more-we-offer-section .feature-icon-box,
+  .more-we-offer-section [class*="icon"] {
+    display: none !important;
+  }
+}
+
+/* ============================================
+   14. Contact Page Mobile Fixes
+   ============================================ */
+
+@media (max-width: 768px) {
+  .contact-content > div {
+    padding: 0 var(--spacing-md) !important;
+    overflow-x: hidden !important;
+  }
+  
+  .contact-content > div > div {
+    grid-template-columns: 1fr !important;
+    gap: var(--spacing-xl) !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+  
+  .contact-content > div > div > div {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+  }
+  
+  .contact-content form,
+  .contact-content form > * {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .contact-content input,
+  .contact-content textarea {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  
+  .contact-map {
+    padding: 0 var(--spacing-md) var(--spacing-3xl) !important;
+    overflow: hidden !important;
+  }
+  
+  .contact-map > div {
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+  
+  .contact-map > div > div {
+    width: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+    height: auto !important;
+    border-radius: 16px !important;
+    overflow: hidden !important;
+  }
+  
+  .contact-map iframe {
+    width: 100% !important;
+    height: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+  }
+}
+
+/* ============================================
+   15. Service Detail Page Image Fix
+   ============================================ */
+
+.service-detail-image {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+}
+
+.service-detail-image img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+}
+
+/* ============================================
+   16. Footer Logo Center Alignment
+   ============================================ */
+
+@media (max-width: 768px) {
+  .footer__logo {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    margin: 0 auto var(--spacing-lg) !important;
+  }
+  
+  .footer__logo-img {
+    margin: 0 auto !important;
+  }
+}
+
+/* ============================================
+   17. Services Dropdown - Move "View All Services" Up
+   ============================================ */
+
+@media (max-width: 1024px) {
+  .header__dropdown-menu {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  .header__dropdown-menu .header__dropdown-link:last-child {
+    order: -1 !important;
+    border-bottom: 1px solid rgba(249, 0, 77, 0.2) !important;
+    margin-bottom: var(--spacing-xs) !important;
+    padding-bottom: var(--spacing-sm) !important;
+    font-weight: 600 !important;
+  }
+}
+
+/* ============================================
+   18. About Section List - Remove Gaps Between Columns
+   ============================================ */
+
+@media (max-width: 768px) {
+  .about__features {
+    gap: 0 !important;
+  }
+  
+  .about__features-col {
+    gap: var(--spacing-sm) !important;
+  }
+  
+  .about__features-col:not(:last-child) {
+    margin-bottom: var(--spacing-sm) !important;
+  }
+}
+
+/* ============================================
+   19. Testimonials Cards - Better Width and Arrow Positioning
+   ============================================ */
+
+@media (max-width: 768px) {
+  .testimonials__slider-wrapper {
+    position: relative !important;
+    padding: 0 !important;
+    max-width: 95% !important;
+  }
+  
+  .testimonial-card,
+  .testimonial {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+}
+
+/* ============================================
+   Additional Mobile Optimizations
+   ============================================ */
+
+@media (max-width: 480px) {
+  /* Ensure all sections have proper padding */
+  section {
+    padding: var(--spacing-2xl) 0 !important;
+  }
+  
+  /* Fix any overflow issues */
+  * {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  /* Prevent horizontal scroll */
+  body, html {
+    overflow-x: hidden !important;
+    width: 100% !important;
+  }
+}
+

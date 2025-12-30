@@ -1,0 +1,353 @@
+/* ============================================
+   Comprehensive Responsive Fixes
+   For All Pages and Components
+   ============================================ */
+
+/* ============================================
+   Contact Page Responsive
+   ============================================ */
+
+@media (max-width: 1024px) {
+  .contact-content > div > div {
+    grid-template-columns: 1fr !important;
+    gap: var(--spacing-2xl) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .contact-content {
+    padding: var(--spacing-3xl) 0 !important;
+  }
+  
+  .contact-content > div > div {
+    gap: var(--spacing-xl) !important;
+  }
+  
+  .contact-hero > div > div:last-child {
+    grid-template-columns: 1fr !important;
+    gap: var(--spacing-2xl) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .contact-content {
+    padding: var(--spacing-2xl) 0 !important;
+  }
+  
+  .contact-content > div {
+    padding: 0 var(--spacing-md) !important;
+  }
+}
+
+/* ============================================
+   About Page Components Responsive
+   ============================================ */
+
+@media (max-width: 768px) {
+  .about-hero {
+    min-height: auto !important;
+    padding: var(--spacing-3xl) 0 !important;
+  }
+  
+  .about-hero > div > div:last-child {
+    grid-template-columns: 1fr !important;
+    gap: var(--spacing-2xl) !important;
+  }
+}
+
+/* ============================================
+   Services Page Responsive
+   ============================================ */
+
+@media (max-width: 1024px) {
+  .services-hero > div > div:last-child {
+    grid-template-columns: 1fr !important;
+    gap: var(--spacing-2xl) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .services-hero {
+    min-height: auto !important;
+    padding: var(--spacing-3xl) 0 !important;
+  }
+}
+
+/* ============================================
+   Blog Page Responsive
+   ============================================ */
+
+@media (max-width: 1024px) {
+  .featured-posts-layout {
+    grid-template-columns: 1fr !important;
+    gap: var(--spacing-lg) !important;
+  }
+  
+  .featured-posts-right {
+    height: auto !important;
+  }
+  
+  .slider-track-container {
+    height: 400px !important;
+  }
+  
+  .featured-slider-card {
+    height: 400px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .featured-posts-section {
+    padding: var(--spacing-3xl) 0 !important;
+  }
+  
+  .slider-track-container {
+    height: 350px !important;
+  }
+  
+  .featured-slider-card {
+    height: 350px !important;
+  }
+  
+  .blog-layout {
+    grid-template-columns: 1fr !important;
+    gap: var(--spacing-xl) !important;
+  }
+  
+  .blog-sidebar {
+    order: 2 !important;
+  }
+  
+  .blog-list {
+    order: 1 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .slider-track-container {
+    height: 300px !important;
+  }
+  
+  .featured-slider-card {
+    height: 300px !important;
+  }
+  
+  .slider-content-overlay {
+    padding: var(--spacing-lg) !important;
+  }
+}
+
+/* ============================================
+   General Layout Fixes
+   ============================================ */
+
+@media (max-width: 1024px) {
+  .container {
+    padding: 0 var(--spacing-lg) !important;
+  }
+  
+  /* All 2-column grids become 1-column */
+  div[style*="grid-template-columns: 1fr 1fr"],
+  div[style*="grid-template-columns: 2fr 1fr"],
+  div[style*="grid-template-columns: 1fr 2fr"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 var(--spacing-md) !important;
+  }
+  
+  /* All multi-column grids stack */
+  div[style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Fix overflow issues */
+  * {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  /* Prevent horizontal scroll */
+  body {
+    overflow-x: hidden;
+  }
+  
+  html {
+    overflow-x: hidden;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 var(--spacing-sm) !important;
+  }
+  
+  /* Ensure all images are responsive */
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+  
+  /* Fix text overflow */
+  h1, h2, h3, h4, h5, h6, p {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+}
+
+/* ============================================
+   Form Elements Responsive
+   ============================================ */
+
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="password"],
+  textarea,
+  select {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+    width: 100% !important;
+  }
+}
+
+/* ============================================
+   Button Responsive
+   ============================================ */
+
+@media (max-width: 480px) {
+  .btn,
+  button[type="submit"],
+  button[type="button"] {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+/* ============================================
+   Image and Media Responsive
+   ============================================ */
+
+@media (max-width: 1024px) {
+  img,
+  video,
+  iframe {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+}
+
+/* ============================================
+   Typography Responsive
+   ============================================ */
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: clamp(2rem, 8vw, 3rem) !important;
+  }
+  
+  h2 {
+    font-size: clamp(1.75rem, 7vw, 2.5rem) !important;
+  }
+  
+  h3 {
+    font-size: clamp(1.5rem, 6vw, 2rem) !important;
+  }
+  
+  p {
+    font-size: clamp(0.9rem, 4vw, 1rem) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: clamp(1.75rem, 10vw, 2.5rem) !important;
+  }
+  
+  h2 {
+    font-size: clamp(1.5rem, 9vw, 2rem) !important;
+  }
+  
+  h3 {
+    font-size: clamp(1.25rem, 8vw, 1.75rem) !important;
+  }
+}
+
+/* ============================================
+   Section Padding Responsive
+   ============================================ */
+
+@media (max-width: 1024px) {
+  section {
+    padding: var(--spacing-4xl) 0 !important;
+  }
+}
+
+@media (max-width: 768px) {
+  section {
+    padding: var(--spacing-3xl) 0 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  section {
+    padding: var(--spacing-2xl) 0 !important;
+  }
+}
+
+/* ============================================
+   Utility Classes
+   ============================================ */
+
+/* Hide on mobile */
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+/* Show only on mobile */
+.show-mobile {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .show-mobile {
+    display: block !important;
+  }
+}
+
+/* ============================================
+   Fix Common Overflow Issues
+   ============================================ */
+
+@media (max-width: 768px) {
+  * {
+    max-width: 100%;
+  }
+  
+  body {
+    overflow-x: hidden;
+    position: relative;
+  }
+  
+  html {
+    overflow-x: hidden;
+  }
+  
+  /* Fix for elements with fixed widths */
+  div[style*="width:"] {
+    max-width: 100% !important;
+  }
+  
+  /* Fix for elements with min-width */
+  div[style*="min-width:"] {
+    min-width: auto !important;
+  }
+}
+
+
+

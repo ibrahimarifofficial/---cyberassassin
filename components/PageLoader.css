@@ -1,0 +1,153 @@
+/* ============================================
+   Cybersecurity Page Loader - Simple Design
+   ============================================ */
+
+.page-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  pointer-events: none;
+  background: #000000;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.page-loader__overlay {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-loader__shield-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Loader Styles */
+.loader {
+  --path: rgba(255, 255, 255, 0.25);
+  --dot: #f9004d;
+  --duration: 1.5s;
+  width: 80px;
+  height: 80px;
+  position: relative;
+}
+
+.loader:before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  position: absolute;
+  display: block;
+  background: var(--dot);
+  top: 61px;
+  left: 35px;
+  transform: translate(-18px, -18px);
+  animation: dotShield var(--duration) cubic-bezier(0.785, 0.135, 0.15, 0.86) infinite;
+  box-shadow: 0 0 16px rgba(249, 0, 77, 0.8), 0 0 24px rgba(249, 0, 77, 0.4);
+}
+
+.loader svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.loader svg path {
+  fill: none;
+  stroke: var(--path);
+  stroke-width: 5px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  stroke-dasharray: 200 300;
+  stroke-dashoffset: 0;
+  animation: pathShield var(--duration) cubic-bezier(0.785, 0.135, 0.15, 0.86) infinite;
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+}
+
+/* Shield Path Animation */
+@keyframes pathShield {
+  0% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  50% {
+    stroke-dashoffset: 200;
+    opacity: 0.8;
+  }
+  100% {
+    stroke-dashoffset: 400;
+    opacity: 1;
+  }
+}
+
+/* Dot Animation for Shield */
+@keyframes dotShield {
+  0% {
+    transform: translate(-24px, -24px);
+    opacity: 1;
+  }
+  25% {
+    transform: translate(0, -48px);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translate(24px, -24px);
+    opacity: 1;
+  }
+  75% {
+    transform: translate(0, 0);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(-24px, -24px);
+    opacity: 1;
+  }
+}
+
+/* Fade Out Animation */
+.page-loader.fade-out {
+  animation: fadeOut 0.3s ease-out forwards;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .loader {
+    width: 70px;
+    height: 70px;
+  }
+
+  .loader:before {
+    width: 8px;
+    height: 8px;
+    top: 53px;
+    left: 31px;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .loader svg path,
+  .loader:before {
+    animation: none;
+  }
+}
+

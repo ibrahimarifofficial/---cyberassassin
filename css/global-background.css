@@ -1,0 +1,16 @@
+/* ============================================
+   Global Background Gradient
+   ============================================ */
+
+body {
+    background: 
+        radial-gradient(circle at 20% 10%, rgba(249, 0, 77, 0.12) 0%, transparent 35%),
+        radial-gradient(circle at 80% 30%, rgba(0, 0, 0, 0.9) 0%, transparent 45%),
+        radial-gradient(circle at 40% 60%, rgba(0, 0, 0, 0.8) 0%, transparent 40%),
+        radial-gradient(circle at 70% 80%, rgba(0, 0, 0, 0.7) 0%, transparent 45%),
+        radial-gradient(circle at 10% 90%, rgba(249, 0, 77, 0.08) 0%, transparent 30%),
+        linear-gradient(180deg, #000000 0%, #000000 50%, #000000 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+

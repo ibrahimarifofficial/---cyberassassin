@@ -1,0 +1,211 @@
+/* ============================================
+   Final CTA Section (Before Footer)
+   ============================================ */
+
+.final-cta {
+    padding: var(--spacing-5xl) 0 0 0;
+    background: transparent;
+    position: relative;
+    overflow: visible;
+}
+
+.final-cta .container {
+    position: relative;
+    z-index: 2;
+}
+
+/* Wrapper */
+.final-cta__wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+}
+
+/* Content */
+.final-cta__content {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.final-cta__title {
+    font-family: var(--font-heading);
+    font-size: 64px;
+    font-weight: 300;
+    line-height: 1.2;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+/* Button */
+.final-cta__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 56px;
+    background: linear-gradient(135deg, #f9004d 0%, #d6003f 100%);
+    color: #ffffff;
+    font-family: var(--font-body);
+    font-size: 18px;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 8px 24px rgba(249, 0, 77, 0.3);
+    align-self: center;
+}
+
+.final-cta__btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(249, 0, 77, 0.4);
+    background: linear-gradient(135deg, #ff1a5e 0%, #f9004d 100%);
+}
+
+.final-cta__btn:active {
+    transform: translateY(-2px);
+}
+
+/* Image */
+.final-cta__image {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    margin-bottom: -200px;
+    z-index: 1;
+}
+
+.final-cta__image img {
+    width: 100%;
+    max-width: 650px;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 20px 60px rgba(249, 0, 77, 0.3));
+    animation: floatImage 6s ease-in-out infinite;
+}
+
+/* Floating Animation */
+@keyframes floatImage {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+/* Glow Effect */
+.final-cta__image::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(249, 0, 77, 0.2) 0%, transparent 70%);
+    border-radius: 50%;
+    filter: blur(60px);
+    z-index: -1;
+    animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 0.5;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+}
+
+/* ============================================
+   Responsive Styles
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .final-cta__wrapper {
+        gap: 60px;
+    }
+    
+    .final-cta__title {
+        font-size: 52px;
+    }
+    
+    .final-cta__image img {
+        max-width: 500px;
+    }
+    
+    .final-cta__image {
+        margin-bottom: -160px;
+    }
+}
+
+@media (max-width: 768px) {
+    .final-cta {
+        padding: var(--spacing-4xl) 0 0 0;
+    }
+    
+    .final-cta__wrapper {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        align-items: center;
+    }
+    
+    .final-cta__content {
+        gap: 32px;
+    }
+    
+    .final-cta__title {
+        font-size: 40px;
+    }
+    
+    .final-cta__btn {
+        padding: 18px 48px;
+        font-size: 17px;
+        border-radius: 6px;
+    }
+    
+    .final-cta__image {
+        order: 2 !important;
+        margin-top: var(--spacing-xl) !important;
+        margin-bottom: -150px !important;
+        position: relative !important;
+        z-index: 1 !important;
+    }
+    
+    .final-cta__image img {
+        max-width: 350px;
+    }
+    
+    .final-cta__image::before {
+        width: 300px;
+        height: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .final-cta__title {
+        font-size: 32px;
+    }
+    
+    .final-cta__image {
+        order: 2 !important;
+        margin-top: var(--spacing-lg) !important;
+        margin-bottom: -120px !important;
+        position: relative !important;
+        z-index: 1 !important;
+    }
+    
+    .final-cta__image img {
+        max-width: 280px;
+    }
+}
+

@@ -1,0 +1,154 @@
+/* Hero Section Styles for Contact, Privacy, and Terms Pages */
+@keyframes glowPulse {
+  0%, 100% {
+    opacity: 0.4;
+    filter: drop-shadow(0 0 4px rgba(249, 0, 77, 0.4));
+  }
+  50% {
+    opacity: 0.7;
+    filter: drop-shadow(0 0 8px rgba(249, 0, 77, 0.7));
+  }
+}
+
+@keyframes moveAlongPathLeft {
+  0% { offset-distance: 0%; }
+  100% { offset-distance: 100%; }
+}
+
+@keyframes moveAlongPathRight {
+  0% { offset-distance: 0%; }
+  100% { offset-distance: 100%; }
+}
+
+/* Contact Page */
+@media (max-width: 1024px) {
+  .contact-hero {
+    min-height: 45vh !important;
+    padding: var(--spacing-3xl) 0 !important;
+  }
+
+  .contact-content > div > div {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .contact-hero {
+    min-height: 40vh !important;
+    padding: var(--spacing-2xl) 0 !important;
+  }
+  
+  .contact-hero > div > div:last-child {
+    grid-template-columns: 1fr !important;
+    gap: var(--spacing-2xl) !important;
+    text-align: center !important;
+  }
+  
+  .contact-hero > div > div:last-child > div:first-child {
+    writing-mode: horizontal-tb !important;
+    transform: none !important;
+    text-align: center !important;
+    padding-right: 0 !important;
+    padding-bottom: var(--spacing-md) !important;
+    font-size: var(--font-size-sm) !important;
+    justify-self: center;
+  }
+  
+  .contact-hero > div > div:last-child > div:first-child > div {
+    display: none !important;
+  }
+  
+  .contact-hero > div > div:last-child > div:last-child {
+    text-align: center !important;
+  }
+  
+  .contact-hero h1 {
+    font-size: clamp(2.5rem, 12vw, 4.5rem) !important;
+  }
+}
+
+/* Privacy Page */
+@media (max-width: 1024px) {
+  .privacy-hero {
+    min-height: 45vh !important;
+    padding: var(--spacing-3xl) 0 !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .privacy-hero {
+    min-height: 40vh !important;
+    padding: var(--spacing-2xl) 0 !important;
+  }
+  
+  .privacy-hero > div > div:last-child {
+    grid-template-columns: 1fr !important;
+    gap: var(--spacing-2xl) !important;
+    text-align: center !important;
+  }
+  
+  .privacy-hero > div > div:last-child > div:first-child {
+    writing-mode: horizontal-tb !important;
+    transform: none !important;
+    text-align: center !important;
+    padding-right: 0 !important;
+    padding-bottom: var(--spacing-md) !important;
+    font-size: var(--font-size-sm) !important;
+    justify-self: center;
+  }
+  
+  .privacy-hero > div > div:last-child > div:first-child > div {
+    display: none !important;
+  }
+  
+  .privacy-hero > div > div:last-child > div:last-child {
+    text-align: center !important;
+  }
+  
+  .privacy-hero h1 {
+    font-size: clamp(2.5rem, 12vw, 4.5rem) !important;
+  }
+}
+
+/* Terms Page */
+@media (max-width: 1024px) {
+  .terms-hero {
+    min-height: 45vh !important;
+    padding: var(--spacing-3xl) 0 !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .terms-hero {
+    min-height: 40vh !important;
+    padding: var(--spacing-2xl) 0 !important;
+  }
+  
+  .terms-hero > div > div:last-child {
+    grid-template-columns: 1fr !important;
+    gap: var(--spacing-2xl) !important;
+    text-align: center !important;
+  }
+  
+  .terms-hero > div > div:last-child > div:first-child {
+    writing-mode: horizontal-tb !important;
+    transform: none !important;
+    text-align: center !important;
+    padding-right: 0 !important;
+    padding-bottom: var(--spacing-md) !important;
+    font-size: var(--font-size-sm) !important;
+    justify-self: center;
+  }
+  
+  .terms-hero > div > div:last-child > div:first-child > div {
+    display: none !important;
+  }
+  
+  .terms-hero > div > div:last-child > div:last-child {
+    text-align: center !important;
+  }
+  
+  .terms-hero h1 {
+    font-size: clamp(2.5rem, 12vw, 4.5rem) !important;
+  }
+}

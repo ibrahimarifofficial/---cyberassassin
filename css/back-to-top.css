@@ -1,0 +1,111 @@
+/* ============================================
+   Back to Top Button
+   ============================================ */
+
+.back-to-top {
+    position: fixed;
+    left: 24px;
+    bottom: 24px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, 
+        rgba(249, 0, 77, 0.15) 0%, 
+        rgba(249, 0, 77, 0.1) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(249, 0, 77, 0.3);
+    border-radius: 12px;
+    color: #f9004d;
+    cursor: pointer;
+    z-index: 9999;
+    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                visibility 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+    visibility: hidden;
+    box-shadow: 
+        0 4px 16px rgba(249, 0, 77, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.back-to-top--visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.back-to-top:hover {
+    background: linear-gradient(135deg, 
+        rgba(249, 0, 77, 0.25) 0%, 
+        rgba(249, 0, 77, 0.15) 100%);
+    border-color: rgba(249, 0, 77, 0.5);
+    color: #ff1a5e;
+    animation-play-state: paused;
+    transform: translateY(-4px);
+    box-shadow: 
+        0 8px 24px rgba(249, 0, 77, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.back-to-top:active {
+    transform: translateY(-2px);
+    animation-play-state: paused;
+}
+
+.back-to-top svg {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.3s ease;
+}
+
+.back-to-top:hover svg {
+    transform: translateY(-2px);
+}
+
+/* Floating Animation */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+.back-to-top--visible {
+    animation: float 3s ease-in-out infinite;
+}
+
+/* ============================================
+   Responsive Styles
+   ============================================ */
+
+@media (max-width: 768px) {
+    .back-to-top {
+        left: 16px;
+        bottom: 16px;
+        width: 44px;
+        height: 44px;
+    }
+    
+    .back-to-top svg {
+        width: 18px;
+        height: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .back-to-top {
+        left: 12px;
+        bottom: 12px;
+        width: 40px;
+        height: 40px;
+    }
+    
+    .back-to-top svg {
+        width: 16px;
+        height: 16px;
+    }
+}
+

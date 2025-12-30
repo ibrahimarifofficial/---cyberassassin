@@ -1,0 +1,63 @@
+/* ============================================
+   ServiceCards Component Responsive Styles
+   ============================================ */
+
+@media (max-width: 1200px) {
+  .service-cards-layout {
+    grid-template-columns: 1fr !important;
+    gap: var(--spacing-lg) !important;
+  }
+
+  .service-card-hover {
+    width: calc((100% - 2 * var(--spacing-xl)) / 3) !important;
+    min-width: calc((100% - 2 * var(--spacing-xl)) / 3) !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .service-cards-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .service-card-hover {
+    width: calc((100% - var(--spacing-xl)) / 2) !important;
+    min-width: calc((100% - var(--spacing-xl)) / 2) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .service-card-hover {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    flex-shrink: 0 !important;
+  }
+  
+  /* Ensure smooth slider transitions on mobile */
+  .service-cards-layout > div:first-child {
+    overflow: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  .service-cards-layout > div:first-child > div {
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    -webkit-transition: -webkit-transform 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    will-change: transform !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .service-card-hover {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    flex-shrink: 0 !important;
+  }
+  
+  /* Optimize for mobile performance */
+  .service-cards-layout > div:first-child > div {
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    -webkit-transition: -webkit-transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+}
+

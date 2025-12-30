@@ -1,0 +1,106 @@
+/* ============================================
+   Infinite Slider
+   ============================================ */
+
+.infinite-slider {
+    width: 100%;
+    background: transparent;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: var(--spacing-xl) 0;
+    overflow: hidden;
+    position: relative;
+    z-index: 10;
+}
+
+.infinite-slider::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 150px;
+    height: 100%;
+    background: linear-gradient(to right, var(--color-bg-primary), transparent);
+    z-index: 2;
+    pointer-events: none;
+}
+
+.infinite-slider::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 150px;
+    height: 100%;
+    background: linear-gradient(to left, var(--color-bg-primary), transparent);
+    z-index: 2;
+    pointer-events: none;
+}
+
+.infinite-slider__track {
+    display: flex;
+    gap: var(--spacing-3xl);
+    animation: slideInfinite 25s linear infinite;
+    width: fit-content;
+    will-change: transform;
+}
+
+.infinite-slider__track:hover {
+    animation-play-state: paused;
+}
+
+.infinite-slider__item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    white-space: nowrap;
+    font-family: var(--font-heading);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-heading-light);
+    color: var(--color-text-primary);
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.infinite-slider__item:hover {
+    opacity: 1;
+}
+
+.infinite-slider__icon {
+    color: var(--color-primary);
+    flex-shrink: 0;
+    opacity: 0.6;
+}
+
+/* Animation */
+@keyframes slideInfinite {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .infinite-slider {
+        padding: var(--spacing-lg) 0;
+    }
+    
+    .infinite-slider__item {
+        font-size: var(--font-size-lg);
+        gap: var(--spacing-sm);
+    }
+    
+    .infinite-slider__icon {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .infinite-slider::before,
+    .infinite-slider::after {
+        width: 50px;
+    }
+}
+

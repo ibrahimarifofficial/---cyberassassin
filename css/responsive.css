@@ -1,0 +1,742 @@
+/* ============================================
+   Comprehensive Responsive Styles
+   Mobile, Tablet, and Large Screen Optimizations
+   ============================================ */
+
+/* ============================================
+   Base Container Responsive Adjustments
+   ============================================ */
+
+@media (max-width: 1536px) {
+    .container {
+        max-width: 1200px;
+        padding: 0 var(--spacing-xl);
+    }
+}
+
+@media (max-width: 1280px) {
+    .container {
+        max-width: 100%;
+        padding: 0 var(--spacing-xl);
+    }
+}
+
+@media (max-width: 1024px) {
+    .container {
+        padding: 0 var(--spacing-lg);
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 var(--spacing-md);
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 var(--spacing-sm);
+    }
+}
+
+/* ============================================
+   Typography Responsive Adjustments
+   ============================================ */
+
+@media (max-width: 1024px) {
+    h1 {
+        font-size: clamp(2.5rem, 5vw, 3.625rem);
+    }
+    
+    h2 {
+        font-size: clamp(2rem, 4vw, 2.25rem);
+    }
+    
+    h3 {
+        font-size: clamp(1.5rem, 3vw, 1.875rem);
+    }
+}
+
+@media (max-width: 768px) {
+    h1 {
+        font-size: clamp(2rem, 6vw, 2.5rem);
+    }
+    
+    h2 {
+        font-size: clamp(1.75rem, 5vw, 2rem);
+    }
+    
+    h3 {
+        font-size: clamp(1.25rem, 4vw, 1.5rem);
+    }
+    
+    body {
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: clamp(1.75rem, 8vw, 2rem);
+    }
+    
+    h2 {
+        font-size: clamp(1.5rem, 7vw, 1.75rem);
+    }
+    
+    h3 {
+        font-size: clamp(1.125rem, 6vw, 1.25rem);
+    }
+    
+    body {
+        font-size: 14px;
+    }
+}
+
+/* ============================================
+   Section Spacing Responsive Adjustments
+   ============================================ */
+
+@media (max-width: 1024px) {
+    section {
+        padding: var(--spacing-4xl) 0;
+    }
+}
+
+@media (max-width: 768px) {
+    section {
+        padding: var(--spacing-3xl) 0;
+    }
+}
+
+@media (max-width: 480px) {
+    section {
+        padding: var(--spacing-2xl) 0;
+    }
+}
+
+/* ============================================
+   Grid Layouts Responsive
+   ============================================ */
+
+/* 3-column grids become 2-column on tablet */
+@media (max-width: 1024px) {
+    .grid-3 {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-xl);
+    }
+}
+
+/* 2-column grids become 1-column on mobile */
+@media (max-width: 768px) {
+    .grid-3,
+    .grid-2 {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-lg);
+    }
+}
+
+/* ============================================
+   Buttons Responsive
+   ============================================ */
+
+@media (max-width: 768px) {
+    .btn {
+        padding: 12px 24px;
+        font-size: 14px;
+    }
+    
+    .btn--cta {
+        padding: 14px 28px;
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .btn {
+        padding: 10px 20px;
+        font-size: 13px;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .btn--cta {
+        padding: 12px 24px;
+        font-size: 14px;
+    }
+}
+
+/* ============================================
+   Cards Responsive
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .card,
+    .service-card,
+    .testimonial-card {
+        padding: var(--spacing-lg);
+    }
+}
+
+@media (max-width: 768px) {
+    .card,
+    .service-card,
+    .testimonial-card {
+        padding: var(--spacing-md);
+    }
+}
+
+/* ============================================
+   Images Responsive
+   ============================================ */
+
+@media (max-width: 1024px) {
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+}
+
+/* ============================================
+   Forms Responsive
+   ============================================ */
+
+@media (max-width: 768px) {
+    input,
+    textarea,
+    select {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 12px 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    input,
+    textarea,
+    select {
+        padding: 10px 14px;
+        font-size: 16px;
+    }
+}
+
+/* ============================================
+   Modals Responsive
+   ============================================ */
+
+@media (max-width: 768px) {
+    .modal,
+    .contact-modal,
+    .legal-modal {
+        padding: var(--spacing-md);
+    }
+    
+    .modal__container,
+    .contact-modal__container,
+    .legal-modal__container {
+        padding: var(--spacing-xl);
+        max-width: 100%;
+        margin: var(--spacing-md);
+    }
+}
+
+@media (max-width: 480px) {
+    .modal__container,
+    .contact-modal__container,
+    .legal-modal__container {
+        padding: var(--spacing-lg);
+        margin: var(--spacing-sm);
+        border-radius: 20px;
+    }
+}
+
+/* ============================================
+   Navigation Responsive Enhancements
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .header__nav {
+        width: 320px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header__nav {
+        width: 100%;
+        right: -100%;
+    }
+    
+    .header__link {
+        padding: 16px 20px;
+        font-size: 18px;
+    }
+}
+
+/* ============================================
+   Hero Section Responsive Enhancements
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .hero {
+        padding: var(--spacing-4xl) 0;
+        min-height: auto;
+    }
+    
+    .hero__content {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-2xl);
+    }
+    
+    .hero__right {
+        order: -1;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero {
+        padding: var(--spacing-3xl) 0;
+    }
+    
+    .hero__actions {
+        flex-direction: column;
+        gap: var(--spacing-md);
+    }
+    
+    .hero__actions .btn {
+        width: 100%;
+    }
+}
+
+/* ============================================
+   Footer Responsive
+   ============================================ */
+
+@media (max-width: 1024px) {
+    .footer__top {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-2xl);
+    }
+}
+
+@media (max-width: 768px) {
+    .footer__top {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-xl);
+    }
+    
+    .footer__column {
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer__social {
+        justify-content: center;
+    }
+}
+
+/* ============================================
+   Utility Classes for Responsive
+   ============================================ */
+
+/* Hide on mobile */
+@media (max-width: 768px) {
+    .hide-mobile {
+        display: none !important;
+    }
+}
+
+/* Hide on tablet and below */
+@media (max-width: 1024px) {
+    .hide-tablet {
+        display: none !important;
+    }
+}
+
+/* Show only on mobile */
+.show-mobile {
+    display: none !important;
+}
+
+@media (max-width: 768px) {
+    .show-mobile {
+        display: block !important;
+    }
+}
+
+/* ============================================
+   Touch-friendly Sizing
+   ============================================ */
+
+@media (hover: none) and (pointer: coarse) {
+    /* Touch devices */
+    button,
+    a,
+    .btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    .header__link {
+        min-height: 48px;
+    }
+}
+
+/* ============================================
+   Landscape Mobile Optimizations
+   ============================================ */
+
+@media (max-width: 896px) and (orientation: landscape) {
+    .hero {
+        min-height: auto;
+        padding: var(--spacing-2xl) 0;
+    }
+    
+    section {
+        padding: var(--spacing-2xl) 0;
+    }
+}
+
+/* ============================================
+   Large Screen Optimizations
+   ============================================ */
+
+@media (min-width: 1536px) {
+    .container {
+        max-width: 1400px;
+    }
+}
+
+@media (min-width: 1920px) {
+    .container {
+        max-width: 1600px;
+    }
+    
+    section {
+        padding: var(--spacing-5xl) 0;
+    }
+}
+
+/* ============================================
+   Additional Section-Specific Responsive Fixes
+   ============================================ */
+
+/* Infinite Slider Responsive */
+@media (max-width: 768px) {
+    .infinite-slider {
+        padding: var(--spacing-lg) 0;
+    }
+    
+    .infinite-slider__item {
+        padding: var(--spacing-sm) var(--spacing-md);
+        font-size: 14px;
+    }
+    
+    .infinite-slider__icon {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+/* Contact Modal Responsive Enhancements */
+@media (max-width: 480px) {
+    .contact-modal__container {
+        padding: var(--spacing-lg);
+        margin: var(--spacing-sm);
+    }
+    
+    .contact-modal__title {
+        font-size: 24px;
+    }
+    
+    .contact-modal__form-group {
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .contact-modal__submit {
+        width: 100%;
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+}
+
+/* Legal Modal Responsive Enhancements */
+@media (max-width: 480px) {
+    .legal-modal__container {
+        padding: var(--spacing-lg);
+        margin: var(--spacing-sm);
+    }
+    
+    .legal-modal__title {
+        font-size: 24px;
+    }
+    
+    .legal-modal__content {
+        font-size: 14px;
+    }
+    
+    .legal-modal__content h3 {
+        font-size: 18px;
+        margin-top: var(--spacing-xl);
+    }
+}
+
+/* Back to Top Button Responsive */
+@media (max-width: 480px) {
+    .back-to-top {
+        left: 12px;
+        bottom: 12px;
+        width: 40px;
+        height: 40px;
+    }
+}
+
+/* Header Mobile Menu Enhancements */
+@media (max-width: 480px) {
+    .header__nav {
+        width: 100%;
+        padding: 80px var(--spacing-md) var(--spacing-xl);
+    }
+    
+    .header__link {
+        padding: 16px var(--spacing-md);
+        font-size: 18px;
+    }
+    
+    .header__cta {
+        width: 100%;
+        justify-content: center;
+        margin-top: var(--spacing-md);
+    }
+}
+
+/* Hero Image Responsive */
+@media (max-width: 1024px) {
+    .hero__right {
+        text-align: center;
+    }
+    
+    .hero__image {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero__image {
+        max-width: 90%;
+    }
+}
+
+/* About Section Image Responsive */
+@media (max-width: 1024px) {
+    .about__image-wrapper {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+    
+    .about__image {
+        width: 100%;
+    }
+}
+
+/* Services Grid Additional Responsive */
+@media (max-width: 480px) {
+    .services__grid {
+        gap: var(--spacing-md);
+    }
+    
+    .service-card {
+        padding: var(--spacing-lg);
+    }
+    
+    .service-card__icon {
+        width: 56px;
+        height: 56px;
+    }
+    
+    .service-card__title {
+        font-size: var(--font-size-base);
+    }
+    
+    .service-card__description {
+        font-size: var(--font-size-sm);
+    }
+}
+
+/* Stats Grid Mobile */
+@media (max-width: 480px) {
+    .stats__grid {
+        gap: var(--spacing-md);
+    }
+    
+    .stat-card {
+        padding: var(--spacing-md);
+    }
+    
+    .stat-card__value {
+        font-size: var(--font-size-2xl);
+    }
+}
+
+/* Testimonials Mobile Enhancements */
+@media (max-width: 480px) {
+    .testimonials__slider-wrapper {
+        gap: var(--spacing-sm);
+        max-width: 98% !important;
+    }
+    
+    .testimonial {
+        padding: 28px 20px !important;
+    }
+    
+    .testimonial__text {
+        font-size: 14px;
+        line-height: 1.6;
+    }
+    
+    .testimonial__name {
+        font-size: 18px;
+    }
+    
+    .testimonial__role {
+        font-size: 13px;
+    }
+}
+
+/* FAQ Mobile Enhancements */
+@media (max-width: 480px) {
+    .faq__question {
+        padding: var(--spacing-md) var(--spacing-lg);
+        font-size: 15px;
+    }
+    
+    .faq__answer {
+        padding: 0 var(--spacing-lg) var(--spacing-md) var(--spacing-lg);
+    }
+    
+    .faq__answer p {
+        font-size: 13px;
+        line-height: 1.6;
+    }
+}
+
+/* Real World Services Mobile */
+@media (max-width: 480px) {
+    .rw-service-card {
+        border-radius: 16px;
+    }
+    
+    .rw-service-card__image {
+        height: 180px;
+    }
+    
+    .rw-service-card__content {
+        padding: var(--spacing-md);
+    }
+    
+    .rw-service-card__title {
+        font-size: var(--font-size-lg);
+    }
+    
+    .rw-service-card__description {
+        font-size: var(--font-size-sm);
+    }
+}
+
+/* Why Choose Us Mobile */
+@media (max-width: 480px) {
+    .why-choose-us__container {
+        padding: var(--spacing-xl) var(--spacing-lg);
+        border-radius: 24px;
+    }
+    
+    .why-choose-us__title {
+        font-size: 28px;
+    }
+    
+    .why-choose-us__feature {
+        gap: var(--spacing-md);
+    }
+    
+    .why-choose-us__icon {
+        width: 56px;
+        height: 56px;
+    }
+    
+    .why-choose-us__feature-title {
+        font-size: 18px;
+    }
+    
+    .why-choose-us__feature-description {
+        font-size: 13px;
+    }
+    
+    .why-choose-us__stat-number {
+        font-size: 40px;
+    }
+}
+
+/* Work With Us Mobile */
+@media (max-width: 480px) {
+    .work-with-us__content {
+        padding: 0 var(--spacing-md);
+    }
+    
+    .work-with-us__btn {
+        padding: 14px 32px;
+        font-size: 15px;
+    }
+}
+
+/* Features Mobile */
+@media (max-width: 480px) {
+    .features__grid {
+        gap: var(--spacing-md);
+    }
+}
+
+/* Floating Cards Mobile */
+@media (max-width: 480px) {
+    .floating-cards {
+        gap: var(--spacing-md);
+    }
+    
+    .floating-cards__card {
+        padding: var(--spacing-md);
+    }
+    
+    .floating-cards__icon {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .floating-cards__title {
+        font-size: var(--font-size-base);
+    }
+    
+    .floating-cards__description {
+        font-size: var(--font-size-sm);
+    }
+}
+
+/* ============================================
+   Print Styles
+   ============================================ */
+
+@media print {
+    .header,
+    .footer,
+    .back-to-top,
+    .btn,
+    .header__actions {
+        display: none !important;
+    }
+    
+    body {
+        background: white;
+        color: black;
+    }
+    
+    section {
+        page-break-inside: avoid;
+    }
+}
+

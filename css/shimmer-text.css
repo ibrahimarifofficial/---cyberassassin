@@ -1,0 +1,162 @@
+/* ============================================
+   Shiny / Shimmer Text Animation
+   ============================================ */
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% center;
+    }
+    100% {
+        background-position: 200% center;
+    }
+}
+
+/* Hero Eyebrow */
+.hero__eyebrow.shimmer-text {
+    background: linear-gradient(
+        90deg,
+        rgba(249, 0, 77, 0.8) 0%,
+        rgba(249, 0, 77, 1) 20%,
+        rgba(255, 255, 255, 0.9) 50%,
+        rgba(249, 0, 77, 1) 80%,
+        rgba(249, 0, 77, 0.8) 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 4s linear infinite;
+}
+
+/* About Eyebrow */
+.about__eyebrow.shimmer-text {
+    background: linear-gradient(
+        90deg,
+        rgba(249, 0, 77, 0.8) 0%,
+        rgba(249, 0, 77, 1) 20%,
+        rgba(255, 255, 255, 0.9) 50%,
+        rgba(249, 0, 77, 1) 80%,
+        rgba(249, 0, 77, 0.8) 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 4s linear infinite;
+}
+
+/* Services Eyebrow */
+.services__eyebrow.shimmer-text {
+    background: linear-gradient(
+        90deg,
+        rgba(249, 0, 77, 0.8) 0%,
+        rgba(249, 0, 77, 1) 20%,
+        rgba(255, 255, 255, 0.9) 50%,
+        rgba(249, 0, 77, 1) 80%,
+        rgba(249, 0, 77, 0.8) 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 4s linear infinite;
+}
+
+/* Why Choose Us Eyebrow */
+.why-choose-us__eyebrow .shimmer-text {
+    background: linear-gradient(
+        90deg,
+        rgba(249, 0, 77, 0.8) 0%,
+        rgba(249, 0, 77, 1) 20%,
+        rgba(255, 255, 255, 0.9) 50%,
+        rgba(249, 0, 77, 1) 80%,
+        rgba(249, 0, 77, 0.8) 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 4s linear infinite;
+    text-decoration: underline;
+    text-decoration-color: #f9004d;
+    text-underline-offset: 4px;
+}
+
+.why-choose-us__eyebrow .shimmer-text .why-choose-gradient {
+    background: linear-gradient(135deg, #f9004d 0%, #ff1a5e 50%, #ff6b9d 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 4s linear infinite;
+    text-decoration: underline;
+    text-decoration-color: #f9004d;
+}
+
+/* Work With Us Eyebrow */
+.work-with-us__eyebrow.shimmer-text {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.7) 0%,
+        rgba(255, 255, 255, 1) 20%,
+        rgba(249, 0, 77, 0.9) 50%,
+        rgba(255, 255, 255, 1) 80%,
+        rgba(255, 255, 255, 0.7) 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 4s linear infinite;
+}
+
+/* Testimonials Eyebrow */
+.testimonials__eyebrow.shimmer-text {
+    background: linear-gradient(
+        90deg,
+        rgba(249, 0, 77, 0.8) 0%,
+        rgba(249, 0, 77, 1) 20%,
+        rgba(255, 255, 255, 0.9) 50%,
+        rgba(249, 0, 77, 1) 80%,
+        rgba(249, 0, 77, 0.8) 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 4s linear infinite;
+}
+
+/* FAQ Eyebrow */
+.faq__eyebrow.shimmer-text {
+    background: linear-gradient(
+        90deg,
+        rgba(249, 0, 77, 0.8) 0%,
+        rgba(249, 0, 77, 1) 20%,
+        rgba(255, 255, 255, 0.9) 50%,
+        rgba(249, 0, 77, 1) 80%,
+        rgba(249, 0, 77, 0.8) 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 4s linear infinite;
+}
+
+/* Final CTA Title */
+.final-cta__title.shimmer-text {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.7) 0%,
+        rgba(255, 255, 255, 1) 20%,
+        rgba(249, 0, 77, 0.9) 50%,
+        rgba(255, 255, 255, 1) 80%,
+        rgba(255, 255, 255, 0.7) 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 4s linear infinite;
+}
+
