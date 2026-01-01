@@ -9,9 +9,6 @@ export const runtime = 'nodejs'
 // Allow GET method for easy browser access
 export async function GET(request: NextRequest) {
   try {
-    // Check database connection first
-    await prisma.$connect()
-    
     // Get credentials from environment variables
     const email = process.env.ADMIN_EMAIL || 'admin@cyber.com'
     const password = process.env.ADMIN_PASSWORD || 'admin'
@@ -19,7 +16,7 @@ export async function GET(request: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    // Create or update admin user
+    // Create or update admin user (Prisma will handle connection automatically)
     const user = await prisma.user.upsert({
       where: { email },
       update: {
@@ -57,13 +54,13 @@ export async function GET(request: NextRequest) {
     let errorMessage = error.message || 'Failed to create admin user'
     let suggestions: string[] = []
     
-    if (errorMessage.includes("Can't reach database server") || errorMessage.includes('P1001')) {
+    if (errorMessage.includes("Can't reach database server") || error.code === 'P1001') {
       suggestions = [
-        '1. Check if your Supabase database is running (it might be paused)',
-        '2. Go to Supabase Dashboard → Project Settings → Database',
-        '3. Verify DATABASE_URL in Vercel environment variables',
-        '4. Make sure the database connection string is correct',
-        '5. If using Supabase free tier, the database might be paused - wake it up first'
+        '1. Verify DATABASE_URL in Vercel environment variables is correct',
+        '2. Check Supabase Dashboard → Project Settings → Database for connection string',
+        '3. Make sure password in DATABASE_URL is URL-encoded (@ = %40)',
+        '4. The connection string should be: postgresql://postgres:Cyber%40Database%40123@db.gibinsemhuoyntxagloj.supabase.co:5432/postgres',
+        '5. After updating DATABASE_URL, redeploy your Vercel project'
       ]
     }
     
@@ -76,8 +73,6 @@ export async function GET(request: NextRequest) {
       },
       { status: 500 }
     )
-  } finally {
-    await prisma.$disconnect().catch(() => {})
   }
 }
 
@@ -91,7 +86,7 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    // Create or update admin user
+    // Create or update admin user (Prisma handles connection automatically)
     const user = await prisma.user.upsert({
       where: { email },
       update: {
@@ -123,10 +118,24 @@ export async function POST(request: NextRequest) {
     })
   } catch (error: any) {
     console.error('Error creating admin user:', error)
+    
+    let errorMessage = error.message || 'Failed to create admin user'
+    let suggestions: string[] = []
+    
+    if (errorMessage.includes("Can't reach database server") || error.code === 'P1001') {
+      suggestions = [
+        '1. Verify DATABASE_URL in Vercel environment variables',
+        '2. Connection string: postgresql://postgres:Cyber%40Database%40123@db.gibinsemhuoyntxagloj.supabase.co:5432/postgres',
+        '3. Make sure password is URL-encoded (@ = %40)',
+        '4. After updating, redeploy your Vercel project'
+      ]
+    }
+    
     return NextResponse.json(
       {
         success: false,
-        error: error.message || 'Failed to create admin user',
+        error: errorMessage,
+        ...(suggestions.length > 0 && { suggestions }),
       },
       { status: 500 }
     )
