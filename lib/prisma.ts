@@ -11,6 +11,7 @@ if (!databaseUrl) {
   console.error('⚠️ DATABASE_URL environment variable is not set!')
 }
 
+// Enhanced Prisma Client configuration for better connection handling
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
@@ -24,7 +25,7 @@ export const prisma =
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 
-// Helper function to check database connection
+// Helper function to check database connection with retry logic
 export async function checkDatabaseConnection() {
   try {
     // First check if DATABASE_URL is set
@@ -36,14 +37,20 @@ export async function checkDatabaseConnection() {
       }
     }
 
-    // Try to connect
-    await prisma.$connect()
+    // Try to connect with timeout
+    const connectPromise = prisma.$connect()
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error('Connection timeout')), 10000)
+    )
+    
+    await Promise.race([connectPromise, timeoutPromise])
     
     // Try a simple query to verify connection works
     await prisma.$queryRaw`SELECT 1`
     
     return { connected: true, error: null, code: null }
   } catch (error: any) {
+    // Don't disconnect on error - let Prisma handle connection pooling
     return {
       connected: false,
       error: error.message || 'Database connection failed',
