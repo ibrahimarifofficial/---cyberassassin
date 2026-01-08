@@ -5,15 +5,17 @@
 .floating-cards {
     position: relative;
     width: 100%;
-    height: 600px;
+    min-height: 750px;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: var(--spacing-xl) 0;
 }
 
 .floating-cards__card {
     position: absolute;
     width: 320px;
+    max-width: 90%;
     padding: var(--spacing-xl);
     background: var(--color-bg-card);
     backdrop-filter: blur(20px);
@@ -50,8 +52,8 @@
 
 /* Card 2 - Dark (Middle Left) */
 .floating-cards__card--2 {
-    top: 50%;
-    left: 20px;
+    top: 45%;
+    left: 10px;
     transform: translateY(-50%);
     z-index: 2;
     animation: floatVertical 6s ease-in-out infinite 2s;
@@ -74,8 +76,8 @@
 
 /* Card 3 - Dark (Bottom Right) */
 .floating-cards__card--3 {
-    bottom: 40px;
-    right: 40px;
+    bottom: 20px;
+    right: 10px;
     z-index: 1;
     animation: float 6s ease-in-out infinite 4s;
     width: 300px;
@@ -152,17 +154,36 @@
    Responsive Styles
    ============================================ */
 
+@media (max-width: 1200px) {
+    .floating-cards {
+        min-height: 800px;
+    }
+    
+    .floating-cards__card--2 {
+        left: 5px;
+        width: 280px;
+    }
+    
+    .floating-cards__card--3 {
+        right: 5px;
+        width: 280px;
+    }
+}
+
 @media (max-width: 1024px) {
     .floating-cards {
+        min-height: auto;
         height: auto;
         display: grid;
         grid-template-columns: 1fr;
         gap: var(--spacing-xl);
+        padding: var(--spacing-lg) 0;
     }
     
     .floating-cards__card {
         position: relative;
         width: 100%;
+        max-width: 100%;
         top: auto !important;
         bottom: auto !important;
         left: auto !important;
@@ -175,6 +196,10 @@
     }
     
     .floating-cards__card--1:hover {
+        transform: translateY(-4px) scale(1.01) !important;
+    }
+    
+    .floating-cards__card--2:hover {
         transform: translateY(-4px) scale(1.01) !important;
     }
 }
