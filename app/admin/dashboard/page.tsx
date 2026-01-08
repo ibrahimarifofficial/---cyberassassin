@@ -53,6 +53,14 @@ export default function AdminDashboard() {
   const [contactsFilter, setContactsFilter] = useState<'all' | 'unread' | 'read'>('unread')
   const [expandedContact, setExpandedContact] = useState<string | null>(null)
   const [subscribers, setSubscribers] = useState<any[]>([])
+  
+  // Pagination states
+  const [postsPage, setPostsPage] = useState(1)
+  const [categoriesPage, setCategoriesPage] = useState(1)
+  const [commentsPage, setCommentsPage] = useState(1)
+  const [contactsPage, setContactsPage] = useState(1)
+  const [subscribersPage, setSubscribersPage] = useState(1)
+  const itemsPerPage = 10
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -74,12 +82,21 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (activeTab === 'comments') {
       fetchComments()
+      setCommentsPage(1) // Reset to page 1 when filter changes
     }
     if (activeTab === 'contacts') {
       fetchAllContacts() // Always fetch all contacts for email-like view
+      setContactsPage(1) // Reset to page 1 when filter changes
     }
     if (activeTab === 'subscribers') {
       fetchSubscribers()
+      setSubscribersPage(1) // Reset to page 1 when tab changes
+    }
+    if (activeTab === 'posts') {
+      setPostsPage(1) // Reset to page 1 when tab changes
+    }
+    if (activeTab === 'categories') {
+      setCategoriesPage(1) // Reset to page 1 when tab changes
     }
   }, [activeTab, commentsFilter])
 
@@ -376,6 +393,90 @@ export default function AdminDashboard() {
   const activeSubscribers = subscribers.filter((s: any) => s.active).length
   const userInitials = (session.user?.name || session.user?.email || 'A').charAt(0).toUpperCase()
 
+  // Pagination helper function
+  const Pagination = ({ currentPage, totalPages, onPageChange }: { currentPage: number, totalPages: number, onPageChange: (page: number) => void }) => {
+    if (totalPages <= 1) return null
+    
+    const pages = []
+    const maxVisible = 5
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2))
+    let endPage = Math.min(totalPages, startPage + maxVisible - 1)
+    
+    if (endPage - startPage < maxVisible - 1) {
+      startPage = Math.max(1, endPage - maxVisible + 1)
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i)
+    }
+    
+    return (
+      <div className="admin-pagination">
+        <button
+          className="admin-pagination-btn"
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          Previous
+        </button>
+        
+        <div className="admin-pagination-pages">
+          {startPage > 1 && (
+            <>
+              <button className="admin-pagination-page" onClick={() => onPageChange(1)}>1</button>
+              {startPage > 2 && <span className="admin-pagination-ellipsis">...</span>}
+            </>
+          )}
+          {pages.map(page => (
+            <button
+              key={page}
+              className={`admin-pagination-page ${page === currentPage ? 'active' : ''}`}
+              onClick={() => onPageChange(page)}
+            >
+              {page}
+            </button>
+          ))}
+          {endPage < totalPages && (
+            <>
+              {endPage < totalPages - 1 && <span className="admin-pagination-ellipsis">...</span>}
+              <button className="admin-pagination-page" onClick={() => onPageChange(totalPages)}>{totalPages}</button>
+            </>
+          )}
+        </div>
+        
+        <button
+          className="admin-pagination-btn"
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          Next
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+      </div>
+    )
+  }
+
+  // Pagination calculations
+  const getPaginatedItems = <T,>(items: T[], page: number, perPage: number) => {
+    const startIndex = (page - 1) * perPage
+    const endIndex = startIndex + perPage
+    return {
+      paginatedItems: items.slice(startIndex, endIndex),
+      totalPages: Math.ceil(items.length / perPage)
+    }
+  }
+
+  const postsPagination = getPaginatedItems(posts, postsPage, itemsPerPage)
+  const categoriesPagination = getPaginatedItems(categories, categoriesPage, itemsPerPage)
+  const commentsPagination = getPaginatedItems(comments, commentsPage, itemsPerPage)
+  const contactsPagination = getPaginatedItems(allContacts, contactsPage, itemsPerPage)
+  const subscribersPagination = getPaginatedItems(subscribers, subscribersPage, itemsPerPage)
+
   return (
     <div className="admin-dashboard-container">
       {/* Sidebar */}
@@ -383,7 +484,7 @@ export default function AdminDashboard() {
         <div className="admin-sidebar-header">
           <Link href="/" className="admin-sidebar-logo">
             <ImageWithFallback
-              src="/assets/images/logo.png"
+              src="/assets/images/dashboardlogo.png"
               alt="CyberAssassin Logo"
               width={150}
               height={150}
@@ -932,8 +1033,9 @@ export default function AdminDashboard() {
                   </button>
                 </div>
               ) : (
-                <div className="admin-posts-list">
-                  {posts.map((post) => (
+                <>
+                  <div className="admin-posts-list">
+                    {postsPagination.paginatedItems.map((post) => (
                     <div key={post.id} className="admin-post-item" onClick={() => handleEditPost(post)}>
                       {post.featuredImage && (
                         <div className="admin-post-image">
@@ -1025,8 +1127,14 @@ export default function AdminDashboard() {
                         </button>
                       </div>
                     </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                  <Pagination
+                    currentPage={postsPage}
+                    totalPages={postsPagination.totalPages}
+                    onPageChange={setPostsPage}
+                  />
+                </>
               )}
             </div>
           )}
@@ -1059,8 +1167,9 @@ export default function AdminDashboard() {
                   </button>
                 </div>
               ) : (
-                <div className="admin-categories-list">
-                  {categories.map((cat) => (
+                <>
+                  <div className="admin-categories-list">
+                    {categoriesPagination.paginatedItems.map((cat) => (
                     <div key={cat.id} className="admin-category-item">
                       <div className="admin-category-info">
                         <h3 className="admin-category-name">{cat.name}</h3>
@@ -1097,8 +1206,14 @@ export default function AdminDashboard() {
                         </button>
                       </div>
                     </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                  <Pagination
+                    currentPage={categoriesPage}
+                    totalPages={categoriesPagination.totalPages}
+                    onPageChange={setCategoriesPage}
+                  />
+                </>
               )}
             </div>
           )}
@@ -1127,8 +1242,9 @@ export default function AdminDashboard() {
                   <p className="admin-empty-state-text">Contact form submissions will appear here</p>
                 </div>
               ) : (
-                <div className="admin-email-list">
-                  {allContacts.map((contact: any) => {
+                <>
+                  <div className="admin-email-list">
+                    {contactsPagination.paginatedItems.map((contact: any) => {
                     const isExpanded = expandedContact === contact.id
                     const isUnread = !contact.read
                     return (
@@ -1221,7 +1337,13 @@ export default function AdminDashboard() {
                       </div>
                     )
                   })}
-                </div>
+                  </div>
+                  <Pagination
+                    currentPage={contactsPage}
+                    totalPages={contactsPagination.totalPages}
+                    onPageChange={setContactsPage}
+                  />
+                </>
               )}
             </div>
           )}
@@ -1254,8 +1376,9 @@ export default function AdminDashboard() {
                   <p className="admin-empty-state-text">Subscribers will appear here once users subscribe to your newsletter</p>
                 </div>
               ) : (
-                <div className="admin-email-list">
-                  {subscribers.map((subscriber: any) => (
+                <>
+                  <div className="admin-email-list">
+                    {subscribersPagination.paginatedItems.map((subscriber: any) => (
                     <div key={subscriber.id} className={`admin-email-item ${subscriber.active ? 'read' : ''}`}>
                       <div className="admin-email-header">
                         <div className="admin-email-sender">
@@ -1312,8 +1435,14 @@ export default function AdminDashboard() {
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                  <Pagination
+                    currentPage={subscribersPage}
+                    totalPages={subscribersPagination.totalPages}
+                    onPageChange={setSubscribersPage}
+                  />
+                </>
               )}
             </div>
           )}
@@ -1366,8 +1495,9 @@ export default function AdminDashboard() {
                   </p>
                 </div>
               ) : (
-                <div className="admin-comments-list">
-                  {comments.map((comment: any) => (
+                <>
+                  <div className="admin-comments-list">
+                    {commentsPagination.paginatedItems.map((comment: any) => (
                     <div key={comment.id} className={`admin-comment-item ${comment.approved ? 'approved' : 'pending'}`}>
                       <div className="admin-comment-header">
                         <div className="admin-comment-author">
@@ -1449,8 +1579,14 @@ export default function AdminDashboard() {
                         </button>
                       </div>
                     </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                  <Pagination
+                    currentPage={commentsPage}
+                    totalPages={commentsPagination.totalPages}
+                    onPageChange={setCommentsPage}
+                  />
+                </>
               )}
             </div>
           )}

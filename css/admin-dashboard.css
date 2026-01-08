@@ -25,13 +25,15 @@
 }
 
 .admin-sidebar-header {
-  padding: 1.5rem;
+  padding: 1.25rem 2rem;
   border-bottom: 1px solid #e5e7eb;
-  background: #000000;
+  background: #ffffff;
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 73px;
+  min-height: 73px;
 }
 
 .admin-sidebar-logo {
@@ -39,14 +41,16 @@
   align-items: center;
   justify-content: center;
   margin: 0;
-  padding: 0.75rem;
+  padding: 0;
   border-radius: 8px;
   transition: all 0.2s ease;
   width: 100%;
+  background: transparent;
 }
 
 .admin-sidebar-logo:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: transparent;
+  opacity: 0.8;
 }
 
 .admin-sidebar-logo-img {
@@ -1265,6 +1269,89 @@
 
 .admin-btn-warning:hover {
   background: #d97706;
+}
+
+/* Pagination */
+.admin-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 2rem;
+  padding: 1.5rem 0;
+  flex-wrap: wrap;
+}
+
+.admin-pagination-btn {
+  padding: 0.625rem 1rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.admin-pagination-btn:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #d1d5db;
+  color: #111827;
+}
+
+.admin-pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.admin-pagination-pages {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.admin-pagination-page {
+  min-width: 40px;
+  height: 40px;
+  padding: 0 0.75rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-pagination-page:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+  color: #111827;
+}
+
+.admin-pagination-page.active {
+  background: #f9004d;
+  border-color: #f9004d;
+  color: #ffffff;
+}
+
+.admin-pagination-page.active:hover {
+  background: #c70039;
+  border-color: #c70039;
+}
+
+.admin-pagination-ellipsis {
+  padding: 0 0.5rem;
+  color: #6b7280;
+  font-size: 0.875rem;
 }
 
 /* Responsive */
