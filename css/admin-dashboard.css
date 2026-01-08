@@ -34,6 +34,7 @@
   justify-content: center;
   height: 73px;
   min-height: 73px;
+  box-sizing: border-box;
 }
 
 .admin-sidebar-logo {
@@ -241,6 +242,9 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   gap: 1rem;
   min-width: 0;
+  height: 73px;
+  min-height: 73px;
+  box-sizing: border-box;
 }
 
 .admin-header-title {
