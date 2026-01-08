@@ -14,12 +14,12 @@ export async function GET(request: NextRequest) {
       hasDatabaseUrl: !!process.env.DATABASE_URL,
       databaseUrlPreview: process.env.DATABASE_URL?.substring(0, 50) + '...',
       hasAdminEmail: !!process.env.ADMIN_EMAIL,
-      adminEmail: process.env.ADMIN_EMAIL || 'admin@cyber.com',
+      adminEmail: process.env.ADMIN_EMAIL || 'admin@cyberassassin.com',
     })
 
     // Get credentials from environment variables
-    const email = process.env.ADMIN_EMAIL || 'admin@cyber.com'
-    const password = process.env.ADMIN_PASSWORD || 'admin'
+    const email = process.env.ADMIN_EMAIL || 'admin@cyberassassin.com'
+    const password = process.env.ADMIN_PASSWORD || 'Cyberassassin@AdminPanel@123456'
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10)
@@ -96,8 +96,8 @@ export async function POST(request: NextRequest) {
   try {
     // Get credentials from request body or environment variables
     const body = await request.json().catch(() => ({}))
-    const email = body.email || process.env.ADMIN_EMAIL || 'admin@cyber.com'
-    const password = body.password || process.env.ADMIN_PASSWORD || 'admin'
+    const email = body.email || process.env.ADMIN_EMAIL || 'admin@cyberassassin.com'
+    const password = body.password || process.env.ADMIN_PASSWORD || 'Cyberassassin@AdminPanel@123456'
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10)
