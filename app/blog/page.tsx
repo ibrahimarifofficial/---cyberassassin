@@ -8,8 +8,10 @@ import LegalModal from '@/components/LegalModal'
 import BackToTop from '@/components/BackToTop'
 import BlogHero from '@/components/blog/BlogHero'
 import FeaturedPostsSection from '@/components/blog/FeaturedPostsSection'
+import FeaturedPostsShimmerLoader from '@/components/blog/FeaturedPostsShimmerLoader'
 import BlogSidebar from '@/components/blog/BlogSidebar'
 import BlogList from '@/components/blog/BlogList'
+import BlogShimmerLoader from '@/components/blog/BlogShimmerLoader'
 import BlogPagination from '@/components/blog/BlogPagination'
 import SortByDropdown from '@/components/blog/SortByDropdown'
 import BlogHelpBox from '@/components/blog/BlogHelpBox'
@@ -35,6 +37,7 @@ type SortOption = 'most-recent' | 'most-old' | 'most-viewed' | 'alphabetical'
 export default function BlogArchivePage() {
   useSmoothScroll()
   const [blogPosts, setBlogPosts] = useState(defaultBlogPosts)
+  const [isLoading, setIsLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState('All')
   const [searchQuery, setSearchQuery] = useState('')
   const [sortBy, setSortBy] = useState<SortOption>('most-recent')
@@ -44,6 +47,7 @@ export default function BlogArchivePage() {
   useEffect(() => {
     // Fetch posts from database API
     const fetchPosts = async () => {
+      setIsLoading(true)
       try {
         const response = await fetch('/api/posts/public')
         if (response.ok) {
@@ -95,6 +99,8 @@ export default function BlogArchivePage() {
       } catch (error) {
         // Fallback to default posts on error
         setBlogPosts(defaultBlogPosts)
+      } finally {
+        setIsLoading(false)
       }
     }
 
@@ -206,7 +212,11 @@ export default function BlogArchivePage() {
         <BlogHero />
 
         {/* Featured Posts Section */}
-        <FeaturedPostsSection posts={blogPosts} />
+        {isLoading ? (
+          <FeaturedPostsShimmerLoader />
+        ) : (
+          <FeaturedPostsSection posts={blogPosts} />
+        )}
 
         {/* Main Content Area */}
         <section className="blog-main-content">
@@ -220,15 +230,20 @@ export default function BlogArchivePage() {
                   onChange={handleSortChange}
                 />
 
-                {/* Blog List */}
-                <BlogList posts={paginatedPosts} />
-
-                {/* Pagination */}
-                <BlogPagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={setCurrentPage}
-                />
+                {/* Blog List or Shimmer Loader */}
+                {isLoading ? (
+                  <BlogShimmerLoader count={postsPerPage} />
+                ) : (
+                  <>
+                    <BlogList posts={paginatedPosts} />
+                    {/* Pagination */}
+                    <BlogPagination
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={setCurrentPage}
+                    />
+                  </>
+                )}
             </div>
 
               {/* Right Side - Sidebar */}

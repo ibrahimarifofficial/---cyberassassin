@@ -12,6 +12,7 @@ import { useSmoothScroll } from '@/hooks/useSmoothScroll'
 import BlogComments from '@/components/blog/BlogComments'
 import RelatedTopics from '@/components/blog/RelatedTopics'
 import BlogHelpBox from '@/components/blog/BlogHelpBox'
+import BlogSingleShimmerLoader from '@/components/blog/BlogSingleShimmerLoader'
 
 // Empty default posts - only admin-created posts will show
 const defaultBlogPosts: any[] = []
@@ -39,10 +40,12 @@ export default function SingleBlogPost() {
   const [post, setPost] = useState<any>(null)
   const [relatedPosts, setRelatedPosts] = useState<any[]>([])
   const [allPosts, setAllPosts] = useState<any[]>(defaultBlogPosts)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     // Fetch posts from database API
     const fetchAllPosts = async () => {
+      setIsLoading(true)
       try {
         const response = await fetch('/api/posts/public')
         if (response.ok) {
@@ -87,6 +90,8 @@ export default function SingleBlogPost() {
       } catch (error) {
         console.error('Error fetching posts:', error)
         setAllPosts(defaultBlogPosts)
+      } finally {
+        setIsLoading(false)
       }
     }
 
@@ -116,6 +121,22 @@ export default function SingleBlogPost() {
     }
   }, [slug, allPosts])
 
+  // Show shimmer loader while loading
+  if (isLoading) {
+    return (
+      <>
+        <Header />
+        <main className="blog-single-container">
+          <BlogSingleShimmerLoader />
+        </main>
+        <Footer />
+        <LegalModal />
+        <BackToTop />
+      </>
+    )
+  }
+
+  // Show not found if post doesn't exist after loading
   if (!post) {
     return (
       <>
