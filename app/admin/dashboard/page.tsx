@@ -64,7 +64,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.push('/admin/login')
+      router.push('/admin/thecyberassassindashboardlogin2026-xyxyxz-01111')
     }
   }, [status, router])
 
@@ -599,7 +599,7 @@ export default function AdminDashboard() {
           </div>
           <button
             className="admin-logout-btn"
-            onClick={() => signOut({ callbackUrl: '/admin/login' })}
+            onClick={() => signOut({ callbackUrl: '/admin/thecyberassassindashboardlogin2026-xyxyxz-01111' })}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>

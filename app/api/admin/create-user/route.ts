@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
         email: email,
         password: password,
       },
-      note: 'You can now login with these credentials at /admin/login',
+      note: 'You can now login with these credentials at /admin/thecyberassassindashboardlogin2026-xyxyxz-01111',
     })
   } catch (error: any) {
     console.error('Error creating admin user:', error)

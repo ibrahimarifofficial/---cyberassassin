@@ -114,7 +114,7 @@ const getNextAuth = async () => {
             strategy: 'jwt',
           },
           pages: {
-            signIn: '/admin/login',
+            signIn: '/admin/thecyberassassindashboardlogin2026-xyxyxz-01111',
           },
           callbacks: {
             async jwt({ token, user }) {
