@@ -75,6 +75,9 @@ const nextConfig = {
   // Production optimizations
   productionBrowserSourceMaps: false,
   
+  // Ensure CSS is handled correctly
+  transpilePackages: [],
+  
   // Performance optimizations
   experimental: {
     // optimizeCss: true, // Disabled - requires critters package
