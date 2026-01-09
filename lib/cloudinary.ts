@@ -24,41 +24,55 @@ export async function uploadToCloudinary(file: File | Buffer, folder: string = '
   format?: string
   bytes?: number
 }> {
-  return new Promise((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream(
-      {
-        folder: `cyberassassin/${folder}`,
-        resource_type: 'auto',
-        transformation: [
-          { quality: 'auto' },
-          { fetch_format: 'auto' },
-        ],
-      },
-      (error, result) => {
-        if (error) {
-          reject(error)
-        } else if (result) {
-          resolve({
-            url: result.secure_url,
-            public_id: result.public_id,
-            width: result.width,
-            height: result.height,
-            format: result.format,
-            bytes: result.bytes,
-          })
-        } else {
-          reject(new Error('Upload failed'))
-        }
-      }
-    )
+  // Check if Cloudinary is configured
+  if (!process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+    throw new Error('Cloudinary configuration is missing. Please check your environment variables.')
+  }
 
-    if (file instanceof File) {
-      // Convert File to Buffer
-      file.arrayBuffer().then(buffer => {
-        uploadStream.end(Buffer.from(buffer))
-      })
-    } else {
-      uploadStream.end(file)
+  return new Promise(async (resolve, reject) => {
+    try {
+      let buffer: Buffer
+
+      if (file instanceof File) {
+        // Convert File to Buffer
+        const arrayBuffer = await file.arrayBuffer()
+        buffer = Buffer.from(arrayBuffer)
+      } else {
+        buffer = file
+      }
+
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: `cyberassassin/${folder}`,
+          resource_type: 'auto',
+          transformation: [
+            { quality: 'auto' },
+            { fetch_format: 'auto' },
+          ],
+        },
+        (error, result) => {
+          if (error) {
+            console.error('Cloudinary upload error:', error)
+            reject(new Error(error.message || 'Failed to upload image to Cloudinary'))
+          } else if (result) {
+            resolve({
+              url: result.secure_url,
+              public_id: result.public_id,
+              width: result.width,
+              height: result.height,
+              format: result.format,
+              bytes: result.bytes,
+            })
+          } else {
+            reject(new Error('Upload failed: No result from Cloudinary'))
+          }
+        }
+      )
+
+      uploadStream.end(buffer)
+    } catch (error: any) {
+      console.error('Error preparing file for upload:', error)
+      reject(new Error(error.message || 'Failed to process file for upload'))
     }
   })
 }

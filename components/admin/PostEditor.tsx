@@ -213,17 +213,22 @@ export default function PostEditor({ post, onClose, onSave }: PostEditorProps) {
         body: formData,
       })
 
+      const data = await response.json()
+
       if (response.ok) {
-        const data = await response.json()
         setFeaturedImage(data.media.url)
         setShowMediaLibrary(false)
         fetchMedia() // Refresh media library
       } else {
-        alert('Upload failed')
+        const errorMessage = data.error || 'Failed to upload image. Please try again.'
+        alert(`Upload failed: ${errorMessage}`)
+        console.error('Upload error:', data)
       }
-    } catch (error) {
+    } catch (error: any) {
       // Upload error - handled by error state
-      alert('Upload failed')
+      const errorMessage = error.message || 'Failed to upload image. Please check your connection and try again.'
+      alert(`Upload failed: ${errorMessage}`)
+      console.error('Upload error:', error)
     } finally {
       setUploading(false)
     }

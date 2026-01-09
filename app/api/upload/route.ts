@@ -86,7 +86,20 @@ export async function POST(request: NextRequest) {
     }))
   } catch (error: any) {
     console.error('Upload error:', error)
-    const { message, status } = safeErrorResponse(error, 'Upload failed')
+    
+    // Provide more specific error messages
+    let errorMessage = 'Upload failed'
+    if (error.message) {
+      if (error.message.includes('Cloudinary configuration')) {
+        errorMessage = 'Image upload service is not configured. Please contact administrator.'
+      } else if (error.message.includes('Invalid')) {
+        errorMessage = error.message
+      } else {
+        errorMessage = error.message
+      }
+    }
+    
+    const { message, status } = safeErrorResponse(error, errorMessage)
     return addSecurityHeaders(NextResponse.json(
       { 
         success: false,
