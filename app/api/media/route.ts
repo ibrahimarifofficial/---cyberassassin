@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
+import { requireAdmin, rateLimit, addSecurityHeaders, safeErrorResponse } from '@/lib/security'
 
 // Force dynamic rendering - this route uses authentication
 export const dynamic = 'force-dynamic'
@@ -8,10 +8,27 @@ export const runtime = 'nodejs'
 
 export async function GET(request: NextRequest) {
   try {
-    // Check authentication
-    const session = await auth()
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    // Rate limiting
+    const rateLimitResult = rateLimit(request, 'admin')
+    if (!rateLimitResult.success) {
+      const response = NextResponse.json(
+        { 
+          success: false,
+          error: rateLimitResult.message || 'Too many requests',
+          retryAfter: rateLimitResult.retryAfter,
+        },
+        { status: 429 }
+      )
+      if (rateLimitResult.retryAfter) {
+        response.headers.set('Retry-After', rateLimitResult.retryAfter.toString())
+      }
+      return addSecurityHeaders(response)
+    }
+
+    // Require admin authentication
+    const authResult = await requireAdmin(request)
+    if (!authResult.authorized) {
+      return addSecurityHeaders(authResult.response!)
     }
 
     const media = await prisma.media.findMany({
@@ -27,13 +44,17 @@ export async function GET(request: NextRequest) {
       },
     })
 
-    return NextResponse.json({ success: true, media })
+    return addSecurityHeaders(NextResponse.json({ success: true, media }))
   } catch (error: any) {
     console.error('Error fetching media:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch media' },
-      { status: 500 }
-    )
+    const { message, status } = safeErrorResponse(error, 'Failed to fetch media')
+    return addSecurityHeaders(NextResponse.json(
+      { 
+        success: false,
+        error: message 
+      },
+      { status }
+    ))
   }
 }
 

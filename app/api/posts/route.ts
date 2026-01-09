@@ -1,13 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
+import { requireAdmin, rateLimit, addSecurityHeaders, safeErrorResponse } from '@/lib/security'
+
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
 
 // GET all posts
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth()
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    // Rate limiting
+    const rateLimitResult = rateLimit(request, 'admin')
+    if (!rateLimitResult.success) {
+      const response = NextResponse.json(
+        { 
+          success: false,
+          error: rateLimitResult.message || 'Too many requests',
+          retryAfter: rateLimitResult.retryAfter,
+        },
+        { status: 429 }
+      )
+      if (rateLimitResult.retryAfter) {
+        response.headers.set('Retry-After', rateLimitResult.retryAfter.toString())
+      }
+      return addSecurityHeaders(response)
+    }
+
+    // Require admin authentication
+    const authResult = await requireAdmin(request)
+    if (!authResult.authorized) {
+      return addSecurityHeaders(authResult.response!)
     }
 
     const posts = await prisma.post.findMany({
@@ -23,25 +45,56 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' },
     })
 
-    return NextResponse.json({ success: true, posts })
+    return addSecurityHeaders(NextResponse.json({ success: true, posts }))
   } catch (error: any) {
     console.error('Error fetching posts:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch posts' },
-      { status: 500 }
-    )
+    const { message, status } = safeErrorResponse(error, 'Failed to fetch posts')
+    return addSecurityHeaders(NextResponse.json(
+      { error: message },
+      { status }
+    ))
   }
 }
 
 // CREATE new post
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth()
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    // Rate limiting
+    const rateLimitResult = rateLimit(request, 'admin')
+    if (!rateLimitResult.success) {
+      const response = NextResponse.json(
+        { 
+          success: false,
+          error: rateLimitResult.message || 'Too many requests',
+          retryAfter: rateLimitResult.retryAfter,
+        },
+        { status: 429 }
+      )
+      if (rateLimitResult.retryAfter) {
+        response.headers.set('Retry-After', rateLimitResult.retryAfter.toString())
+      }
+      return addSecurityHeaders(response)
     }
 
-    const body = await request.json()
+    // Require admin authentication
+    const authResult = await requireAdmin(request)
+    if (!authResult.authorized) {
+      return addSecurityHeaders(authResult.response!)
+    }
+
+    // Parse and validate request body
+    let body
+    try {
+      body = await request.json()
+    } catch {
+      return addSecurityHeaders(NextResponse.json(
+        { 
+          success: false,
+          error: 'Invalid request body' 
+        },
+        { status: 400 }
+      ))
+    }
     const {
       title,
       slug,
@@ -60,17 +113,30 @@ export async function POST(request: NextRequest) {
       follow,
     } = body
 
-    // Generate slug if not provided
-    const postSlug = slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+    // Validate required fields
+    if (!title || !title.trim()) {
+      return addSecurityHeaders(NextResponse.json(
+        { 
+          success: false,
+          error: 'Title is required' 
+        },
+        { status: 400 }
+      ))
+    }
+
+    // Sanitize inputs
+    const { sanitizeInput } = await import('@/lib/security')
+    const sanitizedTitle = sanitizeInput(title)
+    const postSlug = slug ? sanitizeInput(slug) : sanitizedTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 
     const post = await prisma.post.create({
       data: {
-        title,
+        title: sanitizedTitle,
         slug: postSlug,
-        excerpt,
-        content,
-        featuredImage,
-        authorId: session.user.id,
+        excerpt: excerpt ? sanitizeInput(excerpt) : null,
+        content: content || '',
+        featuredImage: featuredImage || null,
+        authorId: authResult.session!.user.id,
         published: published || false,
         featured: featured || false,
         category,
@@ -93,13 +159,17 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    return NextResponse.json({ success: true, post })
+    return addSecurityHeaders(NextResponse.json({ success: true, post }))
   } catch (error: any) {
     console.error('Error creating post:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to create post' },
-      { status: 500 }
-    )
+    const { message, status } = safeErrorResponse(error, 'Failed to create post')
+    return addSecurityHeaders(NextResponse.json(
+      { 
+        success: false,
+        error: message 
+      },
+      { status }
+    ))
   }
 }
 

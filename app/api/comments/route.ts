@@ -1,20 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { requireAdmin, rateLimit, addSecurityHeaders, safeErrorResponse } from '@/lib/security'
+
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
 
 // GET all comments (for admin)
 export async function GET(request: NextRequest) {
   try {
+    // Rate limiting
+    const rateLimitResult = rateLimit(request, 'admin')
+    if (!rateLimitResult.success) {
+      const response = NextResponse.json(
+        { 
+          success: false,
+          error: rateLimitResult.message || 'Too many requests',
+          retryAfter: rateLimitResult.retryAfter,
+        },
+        { status: 429 }
+      )
+      if (rateLimitResult.retryAfter) {
+        response.headers.set('Retry-After', rateLimitResult.retryAfter.toString())
+      }
+      return addSecurityHeaders(response)
+    }
+
+    // Require admin authentication
+    const authResult = await requireAdmin(request)
+    if (!authResult.authorized) {
+      return addSecurityHeaders(authResult.response!)
+    }
+
     const { searchParams } = new URL(request.url)
     const approved = searchParams.get('approved')
     const postId = searchParams.get('postId')
 
+    // Validate and sanitize query parameters
     const where: any = {}
     
     if (approved !== null && approved !== '') {
       where.approved = approved === 'true'
     }
     
-    if (postId) {
+    if (postId && typeof postId === 'string' && postId.length < 100) {
       where.postId = postId
     }
 
@@ -32,71 +61,104 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' },
     })
 
-    return NextResponse.json({ success: true, comments })
+    return addSecurityHeaders(NextResponse.json({ success: true, comments }))
   } catch (error: any) {
     console.error('Error fetching comments:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch comments' },
-      { status: 500 }
-    )
+    const { message, status } = safeErrorResponse(error, 'Failed to fetch comments')
+    return addSecurityHeaders(NextResponse.json(
+      { error: message },
+      { status }
+    ))
   }
 }
 
 // CREATE new comment (public)
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { postId, name, email, content } = body
-
-    if (!postId || !name || !email || !content) {
-      return NextResponse.json(
-        { error: 'All fields are required' },
-        { status: 400 }
+    // Rate limiting for public endpoint
+    const rateLimitResult = rateLimit(request, 'public')
+    if (!rateLimitResult.success) {
+      const response = NextResponse.json(
+        { 
+          success: false,
+          error: rateLimitResult.message || 'Too many requests. Please try again later.',
+          retryAfter: rateLimitResult.retryAfter,
+        },
+        { status: 429 }
       )
+      if (rateLimitResult.retryAfter) {
+        response.headers.set('Retry-After', rateLimitResult.retryAfter.toString())
+      }
+      return addSecurityHeaders(response)
+    }
+
+    // Parse and validate request body
+    let body
+    try {
+      body = await request.json()
+    } catch {
+      return addSecurityHeaders(NextResponse.json(
+        { 
+          success: false,
+          error: 'Invalid request body' 
+        },
+        { status: 400 }
+      ))
+    }
+
+    // Validate and sanitize input
+    const { validateComment } = await import('@/lib/security')
+    const validation = validateComment(body)
+    if (!validation.valid) {
+      return addSecurityHeaders(NextResponse.json(
+        { 
+          success: false,
+          error: 'Validation failed',
+          errors: validation.errors
+        },
+        { status: 400 }
+      ))
     }
 
     // Verify post exists
     const post = await prisma.post.findUnique({
-      where: { id: postId },
+      where: { id: validation.sanitized!.postId },
     })
 
     if (!post) {
-      return NextResponse.json(
-        { error: 'Post not found' },
+      return addSecurityHeaders(NextResponse.json(
+        { 
+          success: false,
+          error: 'Post not found' 
+        },
         { status: 404 }
-      )
+      ))
     }
 
     const comment = await prisma.comment.create({
       data: {
-        postId,
-        name,
-        email,
-        content,
+        postId: validation.sanitized!.postId,
+        name: validation.sanitized!.name,
+        email: validation.sanitized!.email,
+        content: validation.sanitized!.content,
         approved: false, // Comments need approval
-      },
-      include: {
-        post: {
-          select: {
-            id: true,
-            title: true,
-            slug: true,
-          },
-        },
       },
     })
 
-    return NextResponse.json({
+    return addSecurityHeaders(NextResponse.json({
       success: true,
       message: 'Comment submitted successfully. It will be visible after approval.',
-      comment,
-    })
+    }))
   } catch (error: any) {
     console.error('Error creating comment:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to create comment' },
-      { status: 500 }
-    )
+    const { message, status } = safeErrorResponse(error, 'Failed to create comment')
+    return addSecurityHeaders(NextResponse.json(
+      { 
+        success: false,
+        error: message 
+      },
+      { status }
+    ))
   }
 }
 

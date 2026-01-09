@@ -1,14 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
+import { rateLimit, addSecurityHeaders, safeErrorResponse, isValidEmail } from '@/lib/security'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
-// Allow GET method for easy browser access
+// Allow GET method for easy browser access (should be restricted in production)
 export async function GET(request: NextRequest) {
   try {
+    // Rate limiting
+    const rateLimitResult = rateLimit(request, 'admin')
+    if (!rateLimitResult.success) {
+      const response = NextResponse.json(
+        { 
+          success: false,
+          error: rateLimitResult.message || 'Too many requests',
+          retryAfter: rateLimitResult.retryAfter,
+        },
+        { status: 429 }
+      )
+      if (rateLimitResult.retryAfter) {
+        response.headers.set('Retry-After', rateLimitResult.retryAfter.toString())
+      }
+      return addSecurityHeaders(response)
+    }
     // Debug: Log environment variables (without sensitive data)
     console.log('Environment check:', {
       hasDatabaseUrl: !!process.env.DATABASE_URL,
@@ -48,7 +65,7 @@ export async function GET(request: NextRequest) {
 
     const user = await Promise.race([userPromise, timeoutPromise]) as any
 
-    return NextResponse.json({
+    return addSecurityHeaders(NextResponse.json({
       success: true,
       message: 'Admin user created/updated successfully!',
       user: {
@@ -57,47 +74,80 @@ export async function GET(request: NextRequest) {
         role: user.role,
         name: user.name,
       },
-      loginCredentials: {
-        email: email,
-        password: password,
-      },
       note: 'You can now login with these credentials at /admin/thecyberassassindashboardlogin2026-xyxyxz-01111',
-    })
+    }))
   } catch (error: any) {
     console.error('Error creating admin user:', error)
+    const { message, status } = safeErrorResponse(error, 'Failed to create admin user')
     
-    // Provide helpful error message
-    let errorMessage = error.message || 'Failed to create admin user'
-    let suggestions: string[] = []
-    
-    if (errorMessage.includes("Can't reach database server") || error.code === 'P1001') {
-      suggestions = [
-        '1. Verify DATABASE_URL in Vercel environment variables is correct',
-        '2. Check Supabase Dashboard → Project Settings → Database for connection string',
-        '3. Make sure password in DATABASE_URL is URL-encoded (@ = %40)',
-        '4. The connection string should be: postgresql://postgres:Cyber%40Database%40123@db.gibinsemhuoyntxagloj.supabase.co:5432/postgres',
-        '5. After updating DATABASE_URL, redeploy your Vercel project'
-      ]
-    }
-    
-    return NextResponse.json(
+    return addSecurityHeaders(NextResponse.json(
       {
         success: false,
-        error: errorMessage,
-        ...(suggestions.length > 0 && { suggestions }),
-        ...(process.env.NODE_ENV === 'development' && { details: error.stack }),
+        error: message,
       },
-      { status: 500 }
-    )
+      { status }
+    ))
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting
+    const rateLimitResult = rateLimit(request, 'admin')
+    if (!rateLimitResult.success) {
+      const response = NextResponse.json(
+        { 
+          success: false,
+          error: rateLimitResult.message || 'Too many requests',
+          retryAfter: rateLimitResult.retryAfter,
+        },
+        { status: 429 }
+      )
+      if (rateLimitResult.retryAfter) {
+        response.headers.set('Retry-After', rateLimitResult.retryAfter.toString())
+      }
+      return addSecurityHeaders(response)
+    }
+
+    // Parse and validate request body
+    let body
+    try {
+      body = await request.json()
+    } catch {
+      return addSecurityHeaders(NextResponse.json(
+        { 
+          success: false,
+          error: 'Invalid request body' 
+        },
+        { status: 400 }
+      ))
+    }
+
     // Get credentials from request body or environment variables
-    const body = await request.json().catch(() => ({}))
     const email = body.email || process.env.ADMIN_EMAIL || 'admin@cyberassassin.com'
     const password = body.password || process.env.ADMIN_PASSWORD || 'Cyberassassin@AdminPanel@123456'
+
+    // Validate email
+    if (!isValidEmail(email)) {
+      return addSecurityHeaders(NextResponse.json(
+        { 
+          success: false,
+          error: 'Invalid email format' 
+        },
+        { status: 400 }
+      ))
+    }
+
+    // Validate password strength
+    if (!password || password.length < 8) {
+      return addSecurityHeaders(NextResponse.json(
+        { 
+          success: false,
+          error: 'Password must be at least 8 characters long' 
+        },
+        { status: 400 }
+      ))
+    }
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10)
@@ -118,7 +168,7 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    return NextResponse.json({
+    return addSecurityHeaders(NextResponse.json({
       success: true,
       message: 'Admin user created/updated successfully',
       user: {
@@ -127,34 +177,18 @@ export async function POST(request: NextRequest) {
         role: user.role,
         name: user.name,
       },
-      credentials: {
-        email: email,
-        password: password,
-      },
-    })
+    }))
   } catch (error: any) {
     console.error('Error creating admin user:', error)
+    const { message, status } = safeErrorResponse(error, 'Failed to create admin user')
     
-    let errorMessage = error.message || 'Failed to create admin user'
-    let suggestions: string[] = []
-    
-    if (errorMessage.includes("Can't reach database server") || error.code === 'P1001') {
-      suggestions = [
-        '1. Verify DATABASE_URL in Vercel environment variables',
-        '2. Connection string: postgresql://postgres:Cyber%40Database%40123@db.gibinsemhuoyntxagloj.supabase.co:5432/postgres',
-        '3. Make sure password is URL-encoded (@ = %40)',
-        '4. After updating, redeploy your Vercel project'
-      ]
-    }
-    
-    return NextResponse.json(
+    return addSecurityHeaders(NextResponse.json(
       {
         success: false,
-        error: errorMessage,
-        ...(suggestions.length > 0 && { suggestions }),
+        error: message,
       },
-      { status: 500 }
-    )
+      { status }
+    ))
   }
 }
 

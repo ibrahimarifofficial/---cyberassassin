@@ -1,69 +1,121 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
+import { requireAdmin, rateLimit, addSecurityHeaders, safeErrorResponse, sanitizeInput } from '@/lib/security'
 
-// GET all categories
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
+// GET all categories (public for blog, but secured)
 export async function GET() {
   try {
     const categories = await prisma.category.findMany({
       orderBy: { name: 'asc' },
     })
 
-    return NextResponse.json({ success: true, categories })
+    return addSecurityHeaders(NextResponse.json({ success: true, categories }))
   } catch (error: any) {
     console.error('Error fetching categories:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch categories' },
-      { status: 500 }
-    )
+    const { message, status } = safeErrorResponse(error, 'Failed to fetch categories')
+    return addSecurityHeaders(NextResponse.json(
+      { error: message },
+      { status }
+    ))
   }
 }
 
-// CREATE new category
+// CREATE new category (admin only)
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth()
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    // Rate limiting
+    const rateLimitResult = rateLimit(request, 'admin')
+    if (!rateLimitResult.success) {
+      const response = NextResponse.json(
+        { 
+          success: false,
+          error: rateLimitResult.message || 'Too many requests',
+          retryAfter: rateLimitResult.retryAfter,
+        },
+        { status: 429 }
+      )
+      if (rateLimitResult.retryAfter) {
+        response.headers.set('Retry-After', rateLimitResult.retryAfter.toString())
+      }
+      return addSecurityHeaders(response)
     }
 
-    const body = await request.json()
+    // Require admin authentication
+    const authResult = await requireAdmin(request)
+    if (!authResult.authorized) {
+      return addSecurityHeaders(authResult.response!)
+    }
+
+    // Parse and validate request body
+    let body
+    try {
+      body = await request.json()
+    } catch {
+      return addSecurityHeaders(NextResponse.json(
+        { 
+          success: false,
+          error: 'Invalid request body' 
+        },
+        { status: 400 }
+      ))
+    }
+
     const { name, description } = body
 
-    if (!name) {
-      return NextResponse.json(
-        { error: 'Category name is required' },
+    if (!name || !name.trim()) {
+      return addSecurityHeaders(NextResponse.json(
+        { 
+          success: false,
+          error: 'Category name is required' 
+        },
         { status: 400 }
-      )
+      ))
     }
 
+    // Sanitize inputs
+    const sanitizedName = sanitizeInput(name)
+    const sanitizedDescription = description ? sanitizeInput(description) : null
+
     // Generate slug from name
-    const slug = name
+    const slug = sanitizedName
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '')
 
     const category = await prisma.category.create({
       data: {
-        name,
+        name: sanitizedName,
         slug,
-        description,
+        description: sanitizedDescription,
       },
     })
 
-    return NextResponse.json({ success: true, category })
+    return addSecurityHeaders(NextResponse.json({ success: true, category }))
   } catch (error: any) {
     console.error('Error creating category:', error)
+    const { message, status } = safeErrorResponse(error, 'Failed to create category')
+    
     if (error.code === 'P2002') {
-      return NextResponse.json(
-        { error: 'Category with this name already exists' },
+      return addSecurityHeaders(NextResponse.json(
+        { 
+          success: false,
+          error: 'Category with this name already exists' 
+        },
         { status: 400 }
-      )
+      ))
     }
-    return NextResponse.json(
-      { error: error.message || 'Failed to create category' },
-      { status: 500 }
-    )
+    
+    return addSecurityHeaders(NextResponse.json(
+      { 
+        success: false,
+        error: message 
+      },
+      { status }
+    ))
   }
 }
 

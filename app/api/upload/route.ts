@@ -1,21 +1,60 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/auth'
 import { uploadToCloudinary } from '@/lib/cloudinary'
 import { prisma } from '@/lib/prisma'
+import { requireAdmin, rateLimit, addSecurityHeaders, safeErrorResponse, validateFileUpload } from '@/lib/security'
+
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
 
 export async function POST(request: NextRequest) {
   try {
-    // Check authentication
-    const session = await auth()
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    // Rate limiting for upload endpoint
+    const rateLimitResult = rateLimit(request, 'upload')
+    if (!rateLimitResult.success) {
+      const response = NextResponse.json(
+        { 
+          success: false,
+          error: rateLimitResult.message || 'Too many upload requests. Please try again later.',
+          retryAfter: rateLimitResult.retryAfter,
+        },
+        { status: 429 }
+      )
+      if (rateLimitResult.retryAfter) {
+        response.headers.set('Retry-After', rateLimitResult.retryAfter.toString())
+      }
+      return addSecurityHeaders(response)
+    }
+
+    // Require admin authentication
+    const authResult = await requireAdmin(request)
+    if (!authResult.authorized) {
+      return addSecurityHeaders(authResult.response!)
     }
 
     const formData = await request.formData()
     const file = formData.get('file') as File
 
     if (!file) {
-      return NextResponse.json({ error: 'No file provided' }, { status: 400 })
+      return addSecurityHeaders(NextResponse.json(
+        { 
+          success: false,
+          error: 'No file provided' 
+        },
+        { status: 400 }
+      ))
+    }
+
+    // Validate file
+    const validation = validateFileUpload(file)
+    if (!validation.valid) {
+      return addSecurityHeaders(NextResponse.json(
+        { 
+          success: false,
+          error: validation.error || 'Invalid file' 
+        },
+        { status: 400 }
+      ))
     }
 
     // Upload to Cloudinary
@@ -31,11 +70,11 @@ export async function POST(request: NextRequest) {
         width: uploadResult.width,
         height: uploadResult.height,
         format: uploadResult.format,
-        uploadedBy: session.user.id,
+        uploadedBy: authResult.session!.user.id,
       },
     })
 
-    return NextResponse.json({
+    return addSecurityHeaders(NextResponse.json({
       success: true,
       media: {
         id: media.id,
@@ -44,13 +83,17 @@ export async function POST(request: NextRequest) {
         width: media.width,
         height: media.height,
       },
-    })
+    }))
   } catch (error: any) {
     console.error('Upload error:', error)
-    return NextResponse.json(
-      { error: error.message || 'Upload failed' },
-      { status: 500 }
-    )
+    const { message, status } = safeErrorResponse(error, 'Upload failed')
+    return addSecurityHeaders(NextResponse.json(
+      { 
+        success: false,
+        error: message 
+      },
+      { status }
+    ))
   }
 }
 
