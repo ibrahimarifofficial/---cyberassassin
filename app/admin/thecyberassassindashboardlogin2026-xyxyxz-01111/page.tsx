@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import ImageWithFallback from '@/components/ImageWithFallback'
@@ -13,29 +13,112 @@ export default function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [attempts, setAttempts] = useState(0)
+  const [isLocked, setIsLocked] = useState(false)
+  const [lockTime, setLockTime] = useState(0)
+  const emailInputRef = useRef<HTMLInputElement>(null)
+  const passwordInputRef = useRef<HTMLInputElement>(null)
+
+  // Email validation
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
+
+  // Lockout timer
+  useEffect(() => {
+    if (isLocked && lockTime > 0) {
+      const timer = setTimeout(() => {
+        setLockTime(lockTime - 1)
+      }, 1000)
+      return () => clearTimeout(timer)
+    } else if (isLocked && lockTime === 0) {
+      setIsLocked(false)
+      setAttempts(0)
+    }
+  }, [isLocked, lockTime])
+
+  // Auto-focus email input on mount
+  useEffect(() => {
+    emailInputRef.current?.focus()
+  }, [])
+
+  // Clear error when user types
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError('')
+      }, 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [error])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+
+    // Check if account is locked
+    if (isLocked) {
+      setError(`Account temporarily locked. Please try again in ${lockTime} seconds.`)
+      return
+    }
+
+    // Validate email format
+    if (!isValidEmail(email.trim())) {
+      setError('Please enter a valid email address')
+      emailInputRef.current?.focus()
+      return
+    }
+
+    // Validate password
+    if (!password || password.length < 1) {
+      setError('Password is required')
+      passwordInputRef.current?.focus()
+      return
+    }
+
     setLoading(true)
 
     try {
       const result = await signIn('credentials', {
-        email,
+        email: email.trim().toLowerCase(),
         password,
         redirect: false,
       })
 
       if (result?.error) {
-        setError('Invalid email or password')
-      } else {
+        const newAttempts = attempts + 1
+        setAttempts(newAttempts)
+
+        // Lock account after 5 failed attempts
+        if (newAttempts >= 5) {
+          setIsLocked(true)
+          setLockTime(300) // 5 minutes
+          setError('Too many failed attempts. Account locked for 5 minutes.')
+        } else {
+          setError(`Invalid email or password. ${5 - newAttempts} attempts remaining.`)
+        }
+
+        // Clear password on error
+        setPassword('')
+        passwordInputRef.current?.focus()
+      } else if (result?.ok) {
+        // Success - redirect to dashboard
         router.push('/admin/thecyberassassindashboard2026-xyxyxz-01111')
         router.refresh()
       }
-    } catch (err) {
+    } catch (err: any) {
+      console.error('Login error:', err)
       setError('An error occurred. Please try again.')
+      setPassword('')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !loading && !isLocked) {
+      handleSubmit(e as any)
     }
   }
 
@@ -62,17 +145,35 @@ export default function AdminLogin() {
           <div className="admin-login-header">
             <h1 className="admin-login-title">Admin Login</h1>
             <p className="admin-login-subtitle">Enter your credentials to access the dashboard</p>
+            <div className="admin-login-security-indicator">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                <path d="M9 12l2 2 4-4"></path>
+              </svg>
+              <span>Secure Connection</span>
+            </div>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="admin-login-error">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <div className="admin-login-error" role="alert">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10"></circle>
                 <line x1="12" y1="8" x2="12" y2="12"></line>
                 <line x1="12" y1="16" x2="12.01" y2="16"></line>
               </svg>
               <span>{error}</span>
+            </div>
+          )}
+
+          {/* Lockout Warning */}
+          {isLocked && (
+            <div className="admin-login-lockout" role="alert">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <span>Account locked. Please wait {Math.floor(lockTime / 60)}:{(lockTime % 60).toString().padStart(2, '0')}</span>
             </div>
           )}
 
@@ -87,14 +188,23 @@ export default function AdminLogin() {
                 <span>Email Address</span>
               </label>
               <input
+                ref={emailInputRef}
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@example.com"
+                onChange={(e) => {
+                  setEmail(e.target.value)
+                  setError('')
+                }}
+                onKeyDown={handleKeyDown}
+                placeholder="admin@cyberassassin.com"
                 className="admin-login-input"
                 required
-                disabled={loading}
+                disabled={loading || isLocked}
+                autoComplete="email"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck="false"
               />
             </div>
 
@@ -108,14 +218,23 @@ export default function AdminLogin() {
               </label>
               <div className="admin-login-password-wrapper">
                 <input
+                  ref={passwordInputRef}
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value)
+                    setError('')
+                  }}
+                  onKeyDown={handleKeyDown}
                   placeholder="Enter your password"
                   className="admin-login-input"
                   required
-                  disabled={loading}
+                  disabled={loading || isLocked}
+                  autoComplete="current-password"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck="false"
                 />
                 <button
                   type="button"
@@ -141,19 +260,26 @@ export default function AdminLogin() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || isLocked || !email.trim() || !password}
               className="admin-login-submit"
+              aria-label={loading ? 'Signing in...' : 'Sign in to admin dashboard'}
             >
               {loading ? (
                 <>
-                  <svg className="admin-login-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
+                  <div className="admin-login-spinner-small"></div>
+                  <span>Authenticating...</span>
+                </>
+              ) : isLocked ? (
+                <>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                   </svg>
-                  <span>Signing in...</span>
+                  <span>Account Locked</span>
                 </>
               ) : (
                 <>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
                     <polyline points="10 17 15 12 10 7"></polyline>
                     <line x1="15" y1="12" x2="3" y2="12"></line>
