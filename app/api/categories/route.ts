@@ -9,6 +9,21 @@ export const runtime = 'nodejs'
 // GET all categories (public for blog, but secured)
 export async function GET() {
   try {
+    // Check database connection first
+    const { checkDatabaseConnection } = await import('@/lib/prisma')
+    const dbCheck = await checkDatabaseConnection()
+    if (!dbCheck.connected) {
+      return addSecurityHeaders(NextResponse.json(
+        { 
+          success: false,
+          categories: [],
+          error: 'Database connection unavailable',
+          message: 'Unable to fetch categories. Please check your database configuration.'
+        },
+        { status: 503 }
+      ))
+    }
+
     const categories = await prisma.category.findMany({
       orderBy: { name: 'asc' },
     })
@@ -17,8 +32,26 @@ export async function GET() {
   } catch (error: any) {
     console.error('Error fetching categories:', error)
     const { message, status } = safeErrorResponse(error, 'Failed to fetch categories')
+    
+    // Handle database connection errors
+    if (error.message?.includes("Can't reach database server") || error.code === 'P1001') {
+      return addSecurityHeaders(NextResponse.json(
+        { 
+          success: false,
+          categories: [],
+          error: 'Database server is unreachable',
+          message: 'Please check your Supabase database status.'
+        },
+        { status: 503 }
+      ))
+    }
+    
     return addSecurityHeaders(NextResponse.json(
-      { error: message },
+      { 
+        success: false,
+        categories: [],
+        error: message 
+      },
       { status }
     ))
   }

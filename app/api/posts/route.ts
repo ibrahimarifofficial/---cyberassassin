@@ -32,6 +32,21 @@ export async function GET(request: NextRequest) {
       return addSecurityHeaders(authResult.response!)
     }
 
+    // Check database connection
+    const { checkDatabaseConnection } = await import('@/lib/prisma')
+    const dbCheck = await checkDatabaseConnection()
+    if (!dbCheck.connected) {
+      return addSecurityHeaders(NextResponse.json(
+        { 
+          success: false,
+          posts: [],
+          error: 'Database connection unavailable',
+          message: 'Unable to fetch posts. Please check your database configuration.'
+        },
+        { status: 503 }
+      ))
+    }
+
     const posts = await prisma.post.findMany({
       include: {
         author: {
@@ -49,8 +64,26 @@ export async function GET(request: NextRequest) {
   } catch (error: any) {
     console.error('Error fetching posts:', error)
     const { message, status } = safeErrorResponse(error, 'Failed to fetch posts')
+    
+    // Handle database connection errors
+    if (error.message?.includes("Can't reach database server") || error.code === 'P1001') {
+      return addSecurityHeaders(NextResponse.json(
+        { 
+          success: false,
+          posts: [],
+          error: 'Database server is unreachable',
+          message: 'Please check your Supabase database status.'
+        },
+        { status: 503 }
+      ))
+    }
+    
     return addSecurityHeaders(NextResponse.json(
-      { error: message },
+      { 
+        success: false,
+        posts: [],
+        error: message 
+      },
       { status }
     ))
   }
