@@ -29,7 +29,7 @@ export default function AdminLogin() {
       if (result?.error) {
         setError('Invalid email or password')
       } else {
-        router.push('/admin/dashboard')
+        router.push('/admin/thecyberassassindashboard2026-xyxyxz-01111')
         router.refresh()
       }
     } catch (err) {

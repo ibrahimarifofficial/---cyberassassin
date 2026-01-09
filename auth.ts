@@ -83,12 +83,23 @@ const getNextAuth = async () => {
                   return null
                 }
 
+                // Block old admin credentials
+                const blockedEmails = ['admin@cyber.com', 'admin@cyber']
+                if (blockedEmails.includes(credentials.email as string)) {
+                  return null
+                }
+
                 const db = await getPrisma()
                 const user = await db.user.findUnique({
                   where: { email: credentials.email as string },
                 })
 
                 if (!user || !user.password) {
+                  return null
+                }
+
+                // Block old admin password
+                if (credentials.password === 'admin') {
                   return null
                 }
 
