@@ -25,11 +25,11 @@ export function middleware(request: NextRequest) {
   // CORS headers for API routes
   if (request.nextUrl.pathname.startsWith('/api/')) {
     const origin = request.headers.get('origin')
-    const allowedOrigins = [
+    const allowedOrigins: string[] = [
       process.env.NEXT_PUBLIC_APP_URL,
       'http://localhost:3000',
       'https://thecyberassasincom.vercel.app',
-    ].filter(Boolean)
+    ].filter((url): url is string => typeof url === 'string' && url.length > 0)
 
     if (origin && allowedOrigins.some(allowed => origin.includes(allowed))) {
       response.headers.set('Access-Control-Allow-Origin', origin)
